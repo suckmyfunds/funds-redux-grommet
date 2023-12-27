@@ -8,9 +8,8 @@ import hardSet from "redux-persist/es/stateReconciler/hardSet";
 
 export const fetchFunds = createAsyncThunk("funds/fetchAll", async (_, { getState }): Promise<FundRemote[]> => {
     const token = (getState() as RootState).auth.token;
-
     let api = new API(token);
-    return (await api.getRows("funds!A2:E")).map((f, idx) => ({ ...transformFundFromResponse(f), id: idx + 2, status: 'idle'}));
+    return (await api.getRows("funds!A2:E")).map((f, idx) => ({ ...transformFundFromResponse(f), id: idx + 2, status: 'idle' }));
 });
 export const updateFund = createAsyncThunk("funds/update", async (fund: FundRemote, { getState }) => {
     const token = (getState() as RootState).auth.token;
@@ -60,13 +59,12 @@ const slice = createSlice({
 });
 
 const { actions, name } = slice
-const persistConfig = {
-    key: name,
-    storage,
-    stateReconciler: hardSet,
-}
-const reducer = persistReducer(persistConfig, slice.reducer)
-export const fundsSlice = { actions, name, reducer }
+// const persistConfig = {
+//     key: name,
+//     storage,
+// }
+//const reducer = persistReducer(persistConfig, slice.reducer)
+export const fundsSlice = { actions, name, reducer: slice.reducer }
 
 export const selectStatus = (state: RootState) => state.funds.status;
 export const { selectAll } = fundsAdapter.getSelectors((s: RootState) => s.funds)

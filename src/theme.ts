@@ -1,20 +1,29 @@
+export const colors = {
+    black: "#2E2E2E",
+    white: "#C0C0C0",
+    gray: "#999999",
+    barkBlue: "#1f3359",
+    orange: "#E09200",
+    blue: "#106DA4",
+    yellow: "#E0D73A",
+    lightBlue: "#A8B9BF", 
+    
+    red: "#E36134"
+}
+export type Colors = typeof colors
+
 const theme = {
     dark: {
-        backgroundColor: "#1e1e1e",
-        color: "#f0f0f0",
+        bgColor: colors.black,
+        fgColor: colors.white,
+    },
+    light: {
+        bgColor: colors.white,
+        fgColor: colors.black,
     },
     contentPadding: "5px",
-    colors: {
-        black: "#674E42",
-        blue: "#3B7B79",
-        green: "#8C9554",
-        yellow: "#DFC74B",
-        white: "#E4D7B9",
-        red: "#D46E48"
-    }
+    
 }
 
-
 export default theme
-
 export type Theme = typeof theme

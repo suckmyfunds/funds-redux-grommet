@@ -11,14 +11,15 @@ import { useDispatch } from "react-redux";
 //     }
 // })
 
-import {
-    FLUSH,
-    PAUSE,
-    PERSIST,
-    PURGE,
-    REGISTER,
-    REHYDRATE,
-} from 'redux-persist';
+// import {
+//     FLUSH,
+//     PAUSE,
+//     PERSIST,
+//     PURGE,
+//     REGISTER,
+//     REHYDRATE,
+// } from 'redux-persist';
+
 import { authSlice } from "./authSlice";
 import { fundsSlice } from "./fundsSlice";
 import { widgetsSlice } from "./widgetsSlice";
@@ -34,12 +35,12 @@ export const store = configureStore({
     //     effect: async (e, a) => null
     // })],
     
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: {
-                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-            },
-        }),
+    // middleware: (getDefaultMiddleware) =>
+    //     getDefaultMiddleware({
+    //         serializableCheck: {
+    //             ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+    //         },
+    //     }),
 })
 
 export type RootState = ReturnType<typeof store.getState>

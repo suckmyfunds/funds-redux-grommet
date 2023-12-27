@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { auth } from '../api'
-import persistReducer from "redux-persist/es/persistReducer";
-import createExpirationTransform from './utils/persist-expire';
-import storage from "redux-persist/es/storage";
+// import persistReducer from "redux-persist/es/persistReducer";
+// import createExpirationTransform from './utils/persist-expire';
+// import storage from "redux-persist/es/storage";
 
 export const authorize = createAsyncThunk("auth/login", async () => {
     const { token, expires_in } = await auth()
@@ -13,12 +13,12 @@ export const authorize = createAsyncThunk("auth/login", async () => {
 const initialState = { token: "", expiresAt: 0 }
 
 
-const expireTransform = createExpirationTransform({
-    expireKey: 'expiresAt',
-    defaultState: initialState
-});
+// const expireTransform = createExpirationTransform({
+//     expireKey: 'expiresAt',
+//     defaultState: initialState
+// });
 
-const { name, reducer: reducer, actions } = createSlice({
+const slice = createSlice({
     name: "auth",
     initialState,
     reducers: {
@@ -33,14 +33,14 @@ const { name, reducer: reducer, actions } = createSlice({
     }
 });
 
-const persistAuthReducer = persistReducer({
-    key: 'auth',
-    storage,
-    transforms: [expireTransform]
-}, reducer)
+// const persistAuthReducer = persistReducer({
+//     key: 'auth',
+//     storage,
+//     transforms: [expireTransform]
+// }, slice.reducer)
 
 export const authSlice = {
-    name,
-    actions,
-    reducer: persistAuthReducer
+    name: slice.name,
+    actions: slice.actions,
+    reducer: slice.reducer,
 }

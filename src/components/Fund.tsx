@@ -1,18 +1,17 @@
 import { FundRemote } from "../types";
 import styled from "styled-components";
-import styles from '../theme'
-import theme from "../theme";
-const { colors } = theme
+import theme from '../theme'
+import {colors} from "../theme";
+
 
 const FundStyled = styled.div`
     border-radius: 5px;
-    border: 1px solid gray;
     display: grid;
     grid-template-columns: 3fr 1fr;
-    grid-column-gap: calc(${styles.contentPadding}*3);
+    grid-column-gap: calc(${theme.contentPadding}*3);
     grid-template-rows:  1fr 1fr;
-    grid-row-gap: calc(${styles.contentPadding}*1);
-    padding: ${styles.contentPadding};
+    grid-row-gap: calc(${theme.contentPadding}*1);
+    padding: ${theme.contentPadding};
     box-shadow: 1px 3px 5px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.24);
 `
 
@@ -24,18 +23,18 @@ const GridCell = styled.div<{ $row: number, $col: number | string }>`
 
 const colorMap = (value: number, max: number, alert: number, colors: { overflow: string, alert: string, normal: string, negative: string }) => {
     if (value > max) {
-        return colors["overflow"]
+        return colors.overflow
+    } else if (value < 0 || value === 0) {
+        return colors.negative
     } else if (value <= alert) {
-        return colors["alert"]
-    } else if (value < 0) {
-        return colors["negative"]
+        return colors.alert
     } else {
-        return colors["normal"]
+        return colors.normal
     }
 }
 
 const fgColorMap = { negative: colors.red, alert: colors.black, normal: colors.black, overflow: colors.white }
-const bgColorMap = { negative: colors.red, alert: colors.yellow, normal: colors.white, overflow: colors.blue }
+const bgColorMap = { negative: colors.red, alert: colors.yellow, normal: colors.gray, overflow: colors.blue }
 
 const ProgressBar = styled.div<{
     $progress: number,

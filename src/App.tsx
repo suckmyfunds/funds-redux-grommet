@@ -15,15 +15,11 @@ function AuthButton() {
 }
 
 function App() {
-  const fundsStatus = useSelector(selectStatus)
   const authorized = useSelector((state: RootState) => state.auth.token !== "")
-  return <>
+  return <div>
     {!authorized && <AuthButton />}
-    {
-      fundsStatus == "loading" ? <div>Loading funds...</div>
-        : <FundsPage />
-    }
-  </>
+    <FundsPage />
+  </div>
 }
 
 export default App
