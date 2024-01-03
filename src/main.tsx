@@ -3,17 +3,17 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import { Provider } from 'react-redux'
 import { store } from './store'
-import { PersistGate } from 'redux-persist/integration/react'
+import { PersistGate } from 'reduxjs-toolkit-persist/integration/react'
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import theme from './theme.ts'
-// import { persistStore } from 'redux-persist'
+import { persistStore } from 'reduxjs-toolkit-persist'
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 
 
-//const persistor = persistStore(store);
+const persistor = persistStore(store);
 
 
 const GlobalStyle = createGlobalStyle`
@@ -34,9 +34,8 @@ const GlobalStyle = createGlobalStyle`
     min-width: 320px;
     min-height: 100vh;
   }
-
 `
-//import './index.css'
+
 
 const router = createBrowserRouter([
   {
@@ -51,9 +50,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme.light}>
       <GlobalStyle />
       <Provider store={store}>
-        {/* <PersistGate loading={null} persistor={persistor}> */}
+        <PersistGate loading={null} persistor={persistor}>
           <RouterProvider router={router} />
-        {/* </PersistGate> */}
+        </PersistGate>
       </Provider>
     </ThemeProvider>
 

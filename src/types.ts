@@ -5,7 +5,7 @@ export class LogTypes {
 }
 export interface Entity {
     id: string
-    remote: boolean
+    syncDate: string
 }
 
 export interface Notification {
@@ -14,7 +14,6 @@ export interface Notification {
     creationTime: number
 }
 
-
 export interface Fund {
     name: string
     budget: number
@@ -22,17 +21,18 @@ export interface Fund {
     needSync: boolean
 }
 
-export interface FundRemote extends Fund {
-    id: number
-    status: 'pending' | 'idle' 
-}
+export type FundRemote = Fund & Entity
 
 export interface Transaction {
     amount: number
     date: string
     description: string
     synced: boolean
+    fundId: number
 }
+
+export type TransactionRemote = Transaction & Entity
+
 
 // type Dimension = "DIMENSION_UNSPECIFIED" | "ROWS" | "COLUMNS"
 

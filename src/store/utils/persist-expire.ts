@@ -5,25 +5,25 @@ import traverse from 'traverse';
 var PERSIST_EXPIRE_DEFAULT_KEY = 'persistExpiresAt';
 
 export interface PersistExpireConfig {
-    expireKey: string;
-    defaultState?: any;
+  expireKey: string;
+  defaultState?: any;
 }
-export default function(config: PersistExpireConfig) {
+export default function (config: PersistExpireConfig) {
   config = config || {};
   config.expireKey = config.expireKey || PERSIST_EXPIRE_DEFAULT_KEY;
   config.defaultState = config.defaultState || {};
 
-  function dateToUnix (date: Date) {
+  function dateToUnix(date: Date) {
     return +(date.getTime() / 1000).toFixed(0);
   }
 
-  function inbound (state: any) {
+  function inbound(state: any) {
     if (!state) return state;
 
     return state;
   }
 
-  function outbound (state: any) {
+  function outbound(state: any) {
     if (!state) return state;
 
     var validState = traverse(state).forEach(function (value) {

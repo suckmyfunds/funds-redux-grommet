@@ -6793,7 +6793,7 @@ __metadata:
     react-dom: "npm:^18.2.0"
     react-redux: "npm:^9.0.4"
     react-router-dom: "npm:^6.21.0"
-    redux-persist: "npm:^6.0.0"
+    reduxjs-toolkit-persist: "npm:^7.2.1"
     sort-by: "npm:^1.2.0"
     storybook: "npm:^7.6.6"
     styled-components: "npm:^6.1.1"
@@ -9537,15 +9537,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redux-persist@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "redux-persist@npm:6.0.0"
-  peerDependencies:
-    redux: ">4.0.0"
-  checksum: 8242d265ab8d28bbc95cf2dc2a05b869eb67aa309b1ed08163c926f3af56dd8eb1ea62118286083461b8ef2024d3b349fd264e5a62a70eb2e74d068c832d5bf2
-  languageName: node
-  linkType: hard
-
 "redux-thunk@npm:^3.1.0":
   version: 3.1.0
   resolution: "redux-thunk@npm:3.1.0"
@@ -9559,6 +9550,15 @@ __metadata:
   version: 5.0.0
   resolution: "redux@npm:5.0.0"
   checksum: 31e0e1c1483ff7f264cf3a8e47b8d5149249273bc8694edf72291faf9a631e4164a77d515c688e7f74ecac1dc629ed2c05d0598aebdb896ed9e2f39fd014a2a3
+  languageName: node
+  linkType: hard
+
+"reduxjs-toolkit-persist@npm:^7.2.1":
+  version: 7.2.1
+  resolution: "reduxjs-toolkit-persist@npm:7.2.1"
+  peerDependencies:
+    "@reduxjs/toolkit": ^1.6.1
+  checksum: 1b124c32558a47dec61aca4a6ad7c7b78abc10236a41f252663b0d03c979e3e3ed7c1844e5b40e0e26dcd7bd1dfb53bb227feae1743b2863e3ff5a58c5d7be65
   languageName: node
   linkType: hard
 

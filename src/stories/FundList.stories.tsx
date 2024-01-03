@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { FundList } from '../components/FundList';
+import FundList from '../components/FundList';
 
 const meta: Meta<typeof FundList> = {
     title: 'components/FundList',
@@ -18,29 +18,29 @@ export const Primary: Story = {
     args: {
         funds: [
             {
-                id: 1,
+                id: "1",
                 name: "Fund 1",
                 balance: 1000,
                 budget: 1000,
                 needSync: true,
-                status: 'idle'
+                syncDate: "",
             },
 
             {
-                id: 2,
+                id: "2",
                 name: "Fund 2",
                 balance: 2000,
                 budget: 2000,
                 needSync: false,
-                status: 'idle'
+                syncDate: "",
             },
             {
-                id: 3,
+                id: "3",
                 name: "Fund 3",
                 balance: 3000,
                 budget: 3000,
                 needSync: false,
-                status: 'idle'
+                syncDate: "",
             }
         ]
     }

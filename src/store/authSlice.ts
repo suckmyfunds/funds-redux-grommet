@@ -1,9 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import { auth } from '../api'
-// import persistReducer from "redux-persist/es/persistReducer";
-// import createExpirationTransform from './utils/persist-expire';
-// import storage from "redux-persist/es/storage";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { auth } from '../api';
+
 
 export const authorize = createAsyncThunk("auth/login", async () => {
     const { token, expires_in } = await auth()
@@ -12,11 +9,6 @@ export const authorize = createAsyncThunk("auth/login", async () => {
 
 const initialState = { token: "", expiresAt: 0 }
 
-
-// const expireTransform = createExpirationTransform({
-//     expireKey: 'expiresAt',
-//     defaultState: initialState
-// });
 
 const slice = createSlice({
     name: "auth",
@@ -32,12 +24,6 @@ const slice = createSlice({
         });
     }
 });
-
-// const persistAuthReducer = persistReducer({
-//     key: 'auth',
-//     storage,
-//     transforms: [expireTransform]
-// }, slice.reducer)
 
 export const authSlice = {
     name: slice.name,

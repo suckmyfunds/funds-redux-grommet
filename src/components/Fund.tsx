@@ -1,4 +1,4 @@
-import { FundRemote } from "../types";
+import { Entity, Fund, FundRemote } from "../types";
 import styled from "styled-components";
 import theme from '../theme'
 import {colors} from "../theme";
@@ -67,7 +67,7 @@ function Progress({ value, max, alertPercent }: { value: number, max: number, al
 // budget / 100 = balance / x
 // x = balance * (budget/100)
 
-export function Fund({ fund, onClick }: { fund: FundRemote, onClick: (fund: FundRemote) => void }) {
+export default function Fund({ fund, onClick }: { fund: FundRemote, onClick: (fund: Fund) => void }) {
     return (
         <FundStyled key={fund.name} onClick={() => onClick(fund)} >
             <GridCell $row={1} $col={1} className="name">{fund.name}</GridCell>

@@ -21,7 +21,7 @@
     "react-dom": "^18.2.0",
     "react-redux": "^9.0.4",
     "react-router-dom": "^6.21.0",
-    "redux-persist": "^6.0.0",
+    "reduxjs-toolkit-persist": "^7.2.1",
     "sort-by": "^1.2.0",
     "styled-components": "^6.1.1",
     "traverse": "^0.6.8"

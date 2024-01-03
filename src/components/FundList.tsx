@@ -1,6 +1,6 @@
-import { Fund } from './Fund';
 import styled from 'styled-components';
 import { FundRemote } from '../types';
+import FundComponent from './Fund';
 
 const List = styled.div`
     display: grid;
@@ -8,13 +8,12 @@ const List = styled.div`
     grid-gap: 1em 1em;
     
 `
-export function FundList({funds}: {funds: FundRemote[]}) {
-
+export default function FundList({funds}: {funds: FundRemote[]}) {
     return (
-        <List >
+        <List>
             {
                 funds.length > 0
-                    ? funds.map((f) => <Fund fund={f} onClick={() => {}} key={f.id}/>)
+                    ? funds.map((f) => <FundComponent fund={f} onClick={() => {}} key={f.name}/>)
                     : <div>No funds</div>
             }
         </List>
