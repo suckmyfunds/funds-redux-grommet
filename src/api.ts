@@ -1,26 +1,22 @@
 import axios, { AxiosError } from 'axios';
-import type { AddSheetResponse, BatchRequest, BatchResponse, Fund, RowData, SpreadSheet, Transaction, UpdateResponse, ValuesRange } from './types';
-import { loadPersistent, savePersistent } from './utils';
+import type { AddSheetResponse, BatchGetResponse, BatchRequest, BatchResponse, Fund, RowData, SpreadSheet, Transaction, UpdateResponse, ValuesRange } from './types';
 
 const SHEET_ID = "16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ";
-type ReturnPromiseType<T extends (...args: any) => Promise<any>> = T extends (...args: any) => Promise<infer R> ? R : any;
 
-type AnyFunction = (...args: any[]) => any
+// function withDebounce<F extends AnyFunction>(f: AnyFunction) {
+//   let debuonced = false
+//   return async (...args: Parameters<F>): Promise<ReturnPromiseType<F> | undefined> => {
+//     if (!debuonced) {
+//       console.log("run request:", name, f, args)
+//       debuonced = true
+//       setTimeout(() => { debuonced = false }, 300)
+//       return f(args)
+//     } else {
+//       console.log("debounce request", name)
+//     }
+//   }
 
-function withDebounce<F extends AnyFunction>(f: AnyFunction) {
-  let debuonced = false
-  return async (...args: Parameters<F>): Promise<ReturnPromiseType<F> | undefined> => {
-    if (!debuonced) {
-      console.log("run request:", name, f, args)
-      debuonced = true
-      setTimeout(() => { debuonced = false }, 300)
-      return f(args)
-    } else {
-      console.log("debounce request", name)
-    }
-  }
-
-}
+// }
 
 export default class GoogleSpreadsheetAPI {
 
@@ -156,6 +152,13 @@ export default class GoogleSpreadsheetAPI {
     }
   }
 
+  batchGet = async (ranges: string[]): Promise<BatchGetResponse> => {
+    return await this.basicFetch(
+      "GET",
+      `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values:batchGet?ranges=${ranges.join("&ranges=")}`,
+    )
+  }
+
   createSheet = async (name: string): Promise<AddSheetResponse> => {
     let response = await this.batchUpdate([
       {
@@ -276,9 +279,9 @@ export function transactionToRequestObject(transaction: Transaction): { rows: Ro
 
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
 const CLIENT_ID = "651542402284-hfl9taqbdq2lri9nuuig3lcircq4qh0d.apps.googleusercontent.com"
-const API_KEY = 'AlIzaSyD2vT4nkavC_nE8YFWcPUGTCmtAzC9s2c4'
-const CLIENT_SECRET = "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"
-const REDIRECT_URL = 'http://localhost:3000'
+// const API_KEY = 'AlIzaSyD2vT4nkavC_nE8YFWcPUGTCmtAzC9s2c4'
+// const CLIENT_SECRET = "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"
+// const REDIRECT_URL = 'http://localhost:3000'
 
 
 export interface Token {

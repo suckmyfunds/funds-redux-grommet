@@ -1,24 +1,25 @@
-import { useSelector } from 'react-redux'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { FundsPage } from './pages/FundsPage'
-import { selectStatus } from './store/fundsSlice'
+import FundDetailPage from './pages/FundDetailPage';
+import { syncData } from "./store";
+import ActionButton from './components/ActionButton';
 
-import { RootState, authorize, useAppDispatch } from './store'
-import { useCallback } from 'react'
-import Button from './components/Button'
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <FundsPage />,
+  },
+  {
+    path: '/detail/:id',
+    element: <FundDetailPage />,
+  }
 
-function AuthButton() {
-  const dispatch = useAppDispatch()
-  const _authorize = useCallback(() => dispatch(authorize()), [dispatch])
-  return <Button onClick={_authorize}>
-    Login
-  </Button>
-}
+]);
 
 function App() {
-  const authorized = useSelector((state: RootState) => state.auth.token !== "")
   return <div>
-    {!authorized && <AuthButton />}
-    <FundsPage />
+    <ActionButton actionCreator={syncData} name="synchronize" />
+    <RouterProvider router={router} />
   </div>
 }
 

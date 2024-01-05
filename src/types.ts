@@ -5,7 +5,8 @@ export class LogTypes {
 }
 export interface Entity {
     id: string
-    syncDate: string
+    syncDate?: string
+
 }
 
 export interface Notification {
@@ -20,18 +21,18 @@ export interface Fund {
     balance: number
     needSync: boolean
 }
+export type FundCreate= Omit<Fund,"needSync">
 
-export type FundRemote = Fund & Entity
+export type FundRemote = Fund & Entity 
 
 export interface Transaction {
     amount: number
     date: string
     description: string
     synced: boolean
-    fundId: number
 }
 
-export type TransactionRemote = Transaction & Entity
+export type TransactionRemote = Transaction & Entity & { fundId: string }
 
 
 // type Dimension = "DIMENSION_UNSPECIFIED" | "ROWS" | "COLUMNS"
@@ -39,10 +40,15 @@ export type TransactionRemote = Transaction & Entity
 export interface ValuesRange {
     range: string,
     majorDimension: "ROWS",
-    values: any[]
+    values: any[][]
 
 }
-
+export interface BatchGetResponse {
+    spreadsheetId: string;
+    valueRanges: ValuesRange[];
+  }
+  
+ 
 
 export type FundResponseData = [string, string, string, string, string, string, string]
 
@@ -130,9 +136,9 @@ export type BatchResponse = {
 }
 export type BatchReply = {} | AddSheetResponse
 export interface SheetProperties {
-        sheetId: number
-        title: string
-        index: number
+    sheetId: number
+    title: string
+    index: number
 }
 export type AddSheetResponse = {
     addSheet:

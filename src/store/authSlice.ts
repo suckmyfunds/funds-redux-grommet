@@ -27,6 +27,12 @@ const slice = createSlice({
 
 export const authSlice = {
     name: slice.name,
+    reducerPath: slice.reducerPath,
     actions: slice.actions,
     reducer: slice.reducer,
+    initialState,
+}
+
+export function selectIsAuthorized(state: { auth: { expiresAt: number } }) {
+    return state.auth.expiresAt > Date.now()
 }

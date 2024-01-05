@@ -7,11 +7,6 @@ import { PersistGate } from 'reduxjs-toolkit-persist/integration/react'
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import theme from './theme.ts'
 import { persistStore } from 'reduxjs-toolkit-persist'
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-
 
 const persistor = persistStore(store);
 
@@ -34,24 +29,22 @@ const GlobalStyle = createGlobalStyle`
     min-width: 320px;
     min-height: 100vh;
   }
+  a {
+    text-decoration: none;
+    color: ${({ theme }) => theme.fgColor};
+  }
 `
 
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
 
-]);
-
+//@ts-ignore
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider theme={theme.light}>
       <GlobalStyle />
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <RouterProvider router={router} />
+          <App />
         </PersistGate>
       </Provider>
     </ThemeProvider>

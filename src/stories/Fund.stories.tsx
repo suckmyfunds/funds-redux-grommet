@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Fund } from '../components/Fund';
+import Fund from '../components/Fund';
 
 type FundProps = React.ComponentProps<typeof Fund>
     & { balance: number, budget: number }
@@ -9,8 +9,7 @@ const meta: Meta<FundProps> = {
     component: Fund,
     render: ({ balance, budget, fund }) => {
         return <Fund 
-        fund={{ ...fund, balance, budget }} 
-        onClick={() => null} />
+        fund={{ ...fund, balance, budget }} />
     },
     argTypes: {
         balance: {
@@ -44,14 +43,12 @@ type Story = StoryObj<typeof Fund>;
 export const Primary: Story = {
     args: {
         fund: {
-            id: 0,
             name: 'Fund 1',
             budget: 1000,
             balance: 800,
             needSync: false,
-            status: 'idle',
-
-        },
-        onClick: () => { },
+            id: "id",
+            syncDate: ""
+        }
     }
 }

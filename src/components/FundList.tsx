@@ -8,12 +8,19 @@ const List = styled.div`
     grid-gap: 1em 1em;
     
 `
-export default function FundList({funds}: {funds: FundRemote[]}) {
+export default function FundList(
+    {
+        funds,
+        selectedId,
+    }: {
+        funds: FundRemote[],
+        selectedId?: string
+    }) {
     return (
         <List>
             {
                 funds.length > 0
-                    ? funds.map((f) => <FundComponent fund={f} onClick={() => {}} key={f.name}/>)
+                    ? funds.map((f) => <FundComponent fund={f} key={f.name} selected={f.id === selectedId}/>)
                     : <div>No funds</div>
             }
         </List>

@@ -1,25 +1,22 @@
-import { Entity, Fund, FundRemote } from "../types";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
-import theme from '../theme'
-import {colors} from "../theme";
+import theme, { colors } from '../theme';
+import { FundRemote } from "../types";
+import GridCell from "./layout/GridCell";
+import TransactionEditor from "./TransactionEditor";
 
-
-const FundStyled = styled.div`
+const FundStyled = styled.div<{ $selected: boolean }>`
     border-radius: 5px;
     display: grid;
+    background-color: ${props => props.$selected ? colors.lightBlue : colors.white};
     grid-template-columns: 3fr 1fr;
     grid-column-gap: calc(${theme.contentPadding}*3);
-    grid-template-rows:  1fr 1fr;
+    grid-template-rows:  1fr 1fr auto;
     grid-row-gap: calc(${theme.contentPadding}*1);
     padding: ${theme.contentPadding};
     box-shadow: 1px 3px 5px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.24);
 `
 
-
-const GridCell = styled.div<{ $row: number, $col: number | string }>`
-    grid-row: ${props => props.$row};
-    grid-column: ${props => props.$col};
-`
 
 const colorMap = (value: number, max: number, alert: number, colors: { overflow: string, alert: string, normal: string, negative: string }) => {
     if (value > max) {
@@ -45,9 +42,7 @@ const ProgressBar = styled.div<{
     width: ${props => Math.max(Math.min(100, props.$progress), 0)}%;
     border-radius: 2px;
 `
-const FullWidthBorder = styled(GridCell)`
-    width: 100%;
-    min-width: 200px;
+const Bordered = styled(GridCell)`
     border: 1px solid black;
     border-radius: 3px;
 `
@@ -56,24 +51,21 @@ const ProgressBarContainer = styled.div`
 `
 
 function Progress({ value, max, alertPercent }: { value: number, max: number, alertPercent: number }) {
-    return <FullWidthBorder $row={2} $col={"1/4"}>
+    return <Bordered $row={2} $col={"1/3"}>
         <ProgressBar $alertPercent={alertPercent} $progress={value / (max / 100)} >
             <ProgressBarContainer>
                 {value < max ? value : `${value} (+${value - max})`}
             </ProgressBarContainer>
         </ProgressBar>
-    </FullWidthBorder>
+    </Bordered>
 }
-// budget / 100 = balance / x
-// x = balance * (budget/100)
 
-export default function Fund({ fund, onClick }: { fund: FundRemote, onClick: (fund: Fund) => void }) {
-    return (
-        <FundStyled key={fund.name} onClick={() => onClick(fund)} >
-            <GridCell $row={1} $col={1} className="name">{fund.name}</GridCell>
-            <GridCell $row={1} $col={2} className="budget"></GridCell>
-            <Progress value={fund.balance} max={fund.budget} alertPercent={15} />
-        </FundStyled>
-    )
-
+export default function Fund({ fund, selected }: { fund: FundRemote, selected?: boolean }) {
+    return <FundStyled key={fund.name} $selected={!!selected}>
+        <GridCell $row={1} $col={"1/3"} className="name">
+            {selected ? fund.name : <Link style={{ display: 'block', width: "100%" }} to={`/detail/${fund.id}`}>{fund.name}</Link>}
+        </GridCell>
+        <Progress value={fund.balance} max={fund.budget} alertPercent={15} />
+        <GridCell $row={3} $col={"1/3"}><TransactionEditor fundId={fund.id} /></GridCell>
+    </FundStyled>
 }

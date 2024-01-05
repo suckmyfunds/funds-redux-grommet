@@ -1,6 +1,6 @@
-import { PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { createEntityAdapter, createSelector, createSlice } from "@reduxjs/toolkit";
 import { RootState } from ".";
-import { Entity, Transaction, TransactionRemote } from "../types";
+import { TransactionRemote } from "../types";
 
 
 
@@ -23,7 +23,7 @@ import { Entity, Transaction, TransactionRemote } from "../types";
 
 //         return (await api.getRows(`${fundName}!A2:E`)).map((t, idx) => ({ ...transformTransactionFromResponse(t), id: idx + 2, status: 'idle', fundId }));
 //     });
- 
+
 
 const adapter = createEntityAdapter({
     selectId: (t: TransactionRemote) => t.id
@@ -36,12 +36,21 @@ const slice = createSlice({
         add: adapter.addOne,
         remove: adapter.removeOne,
         update: adapter.updateOne,
+        replace: adapter.setAll,
     }
 })
 
 
-export const transactionsSlice = slice
+export const transactionsSlice = { ...slice, initialState: adapter.getInitialState() }
+const selectors = adapter.getSelectors((s: RootState) => s.transactions)
+export const { selectAll: selectAllTransactions } = selectors
 
-export const selectTransactions = (state: RootState) => (fundId: number) => {
-    return adapter.getSelectors().selectAll(state.transactions).filter(t => t.fundId === fundId)
-}
+export const selectFundTransactions = createSelector([
+    selectAllTransactions,
+    (_, fundId: string) => fundId
+],
+    (transactions, fundId) => transactions.filter(t => t.fundId === fundId))
+
+export const selectUnsyncedTransactions = createSelector([
+    selectAllTransactions,
+], transactions => transactions.filter(t => !t.synced))

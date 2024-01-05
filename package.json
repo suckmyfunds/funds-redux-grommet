@@ -20,7 +20,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^9.0.4",
-    "react-router-dom": "^6.21.0",
+    "react-router-dom": "^6.21.1",
     "reduxjs-toolkit-persist": "^7.2.1",
     "sort-by": "^1.2.0",
     "styled-components": "^6.1.1",
@@ -37,6 +37,7 @@
     "@storybook/test": "^7.6.6",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
+    "@types/sort-by": "^1",
     "@types/traverse": "^0",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
@@ -45,9 +46,11 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "eslint-plugin-storybook": "^0.6.15",
+    "rollup-plugin-typescript": "^1.0.1",
     "storybook": "^7.6.6",
     "typescript": "^5.2.2",
-    "vite": "^5.0.8"
+    "vite": "^5.0.8",
+    "vite-plugin-pwa": "^0.17.4"
   },
   "packageManager": "yarn@4.0.2",
   "eslintConfig": {
