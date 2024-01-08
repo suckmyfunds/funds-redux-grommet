@@ -1,4 +1,4 @@
-import { createEntityAdapter, createSelector, createSlice } from "@reduxjs/toolkit";
+import { createAction, createEntityAdapter, createReducer, createSelector, createSlice, nanoid } from "@reduxjs/toolkit";
 import { RootState } from ".";
 import { TransactionRemote } from "../types";
 
@@ -25,6 +25,8 @@ import { TransactionRemote } from "../types";
 //     });
 
 
+export const makeMonthIncome = createAction("transactions/makeMonthIncome", (date?: string, amount?: number) => ({ payload: { date, amount } }))
+
 const adapter = createEntityAdapter({
     selectId: (t: TransactionRemote) => t.id
 })
@@ -37,20 +39,47 @@ const slice = createSlice({
         remove: adapter.removeOne,
         update: adapter.updateOne,
         replace: adapter.setAll,
-    }
+        addMany: adapter.addMany,
+    }, 
+    
 })
+
+const selectors = adapter.getSelectors((s: RootState) => s.transactions)
 
 
 export const transactionsSlice = { ...slice, initialState: adapter.getInitialState() }
-const selectors = adapter.getSelectors((s: RootState) => s.transactions)
+
+
 export const { selectAll: selectAllTransactions } = selectors
 
-export const selectFundTransactions = createSelector([
-    selectAllTransactions,
-    (_, fundId: string) => fundId
-],
-    (transactions, fundId) => transactions.filter(t => t.fundId === fundId))
 
-export const selectUnsyncedTransactions = createSelector([
-    selectAllTransactions,
-], transactions => transactions.filter(t => !t.synced))
+export const selectFundTransactions = createSelector(
+    [
+        selectAllTransactions,
+        (_, fundId: string) => fundId
+    ],
+    (transactions, fundId) => transactions.filter(t => t.fundId === fundId)
+)
+
+
+export const selectUnsyncedTransactions = createSelector(
+    [
+        selectAllTransactions,
+    ], transactions => transactions.filter(t => !t.synced)
+)
+
+
+export const selectUnsyncedFundTransactions = createSelector(
+    [
+        selectUnsyncedTransactions,
+        (_, fundId: string) => fundId
+    ],
+    (transactions, fundId) => transactions.filter(t => t.fundId === fundId)
+)
+
+export const selectLocalTransactions = createSelector(
+    [
+        selectAllTransactions
+    ],
+    (transactions) => transactions.filter(t => t.syncDate === undefined)
+)

@@ -1,14 +1,13 @@
 import { useSelector } from "react-redux";
 import FundList from "../components/FundList";
 
-import { selectAllFunds, selectStatus } from "../store/fundsSlice";
+import { selectFundsIds, selectStatus } from "../store/fundsSlice";
 
 
 export function FundsPage() {
-    const funds = useSelector(selectAllFunds)
-
+    const fundIds = useSelector(selectFundsIds)
     const fundsStatus = useSelector(selectStatus)
-    if (funds.length === 0) {
+    if (fundIds.length === 0) {
         return <div>No funds found</div>
     }
     if (fundsStatus === 'loading') {
@@ -17,7 +16,7 @@ export function FundsPage() {
 
     return <>
 
-        <FundList funds={funds}/>
+        <FundList fundIds={fundIds}/>
     </>
 
 }

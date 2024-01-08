@@ -1,4 +1,4 @@
-import { AsyncThunk } from '@reduxjs/toolkit';
+import { ActionCreator, AsyncThunk } from '@reduxjs/toolkit';
 import { useCallback } from 'react';
 import Button from './Button';
 import { useAppDispatch } from '../store';
@@ -7,7 +7,7 @@ export default function ActionButton(
   {
     actionCreator, name
   }: {
-    actionCreator: AsyncThunk<any, void, any>;
+    actionCreator: AsyncThunk<any, void, any> | ActionCreator<any>;
     name: string;
   }) {
   const dispatch = useAppDispatch();

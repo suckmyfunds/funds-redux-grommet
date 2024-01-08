@@ -228,13 +228,20 @@ export function transformFundFromResponse(
 
 //TODO: use https://github.com/Hookyns/tst-reflect for reflection and auto generation of those functions
 export function transformTransactionFromResponse(vals: string[]): Transaction {
-  let [amount, date, description, synced] = vals
+  let [amount_, date, description, synced, type_] = vals
+  const amount = parseFloat(amount_.replace(",", "."))
+  let type: "EXPENSE" | "INCOME" = "EXPENSE"
+
+  if (type_.toUpperCase() == "INCOME" || amount < 0) {
+    type = "INCOME"
+  }
   // TODO: GET ID 
   return {
-    amount: Number.parseFloat(amount)
+    amount
     , date
     , description
     , synced: synced == "TRUE"
+    , type
   }
 }
 
@@ -260,7 +267,7 @@ export function fundToRequestObject(fund: Fund): { rows: RowData } {
 
 
 export function transactionToRequest(transaction: Transaction) {
-  return [String(transaction.amount), transaction.date, transaction.description, transaction.synced ? "TRUE" : "FALSE"]
+  return [String(transaction.amount), transaction.date, transaction.description, transaction.synced ? "TRUE" : "FALSE", transaction.type]
 }
 
 

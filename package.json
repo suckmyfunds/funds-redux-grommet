@@ -15,6 +15,7 @@
     "@redux-offline/redux-offline": "^2.6.0",
     "@reduxjs/toolkit": "^2.0.1",
     "axios": "^1.6.2",
+    "framer-motion": "^10.17.9",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "react": "^18.2.0",

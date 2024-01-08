@@ -18,18 +18,18 @@ export interface Notification {
 export interface Fund {
     name: string
     budget: number
-    balance: number
     needSync: boolean
 }
-export type FundCreate= Omit<Fund,"needSync">
+export type FundCreate = Omit<Fund, "needSync">
 
-export type FundRemote = Fund & Entity 
+export type FundRemote = Fund & Entity
 
 export interface Transaction {
     amount: number
     date: string
     description: string
     synced: boolean
+    type: "INCOME" | "EXPENSE"
 }
 
 export type TransactionRemote = Transaction & Entity & { fundId: string }
@@ -46,9 +46,9 @@ export interface ValuesRange {
 export interface BatchGetResponse {
     spreadsheetId: string;
     valueRanges: ValuesRange[];
-  }
-  
- 
+}
+
+
 
 export type FundResponseData = [string, string, string, string, string, string, string]
 

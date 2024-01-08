@@ -1,18 +1,22 @@
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { selectFund } from "../store/fundsSlice";
 import theme, { colors } from '../theme';
-import { FundRemote } from "../types";
-import GridCell from "./layout/GridCell";
+import DraftStyle from "./DraftStyle";
 import TransactionEditor from "./TransactionEditor";
+import GridCell from "./layout/GridCell";
 
-const FundStyled = styled.div<{ $selected: boolean }>`
+const FundStyled = styled(DraftStyle) <{ $selected: boolean }>`
     border-radius: 5px;
-    display: grid;
     background-color: ${props => props.$selected ? colors.lightBlue : colors.white};
+    display: grid;
+
     grid-template-columns: 3fr 1fr;
     grid-column-gap: calc(${theme.contentPadding}*3);
     grid-template-rows:  1fr 1fr auto;
     grid-row-gap: calc(${theme.contentPadding}*1);
+
     padding: ${theme.contentPadding};
     box-shadow: 1px 3px 5px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.24);
 `
@@ -54,18 +58,33 @@ function Progress({ value, max, alertPercent }: { value: number, max: number, al
     return <Bordered $row={2} $col={"1/3"}>
         <ProgressBar $alertPercent={alertPercent} $progress={value / (max / 100)} >
             <ProgressBarContainer>
-                {value < max ? value : `${value} (+${value - max})`}
+                {value < max ? value.toFixed(2) : `${value.toFixed(2)} (+${(value - max).toFixed(2)})`}
             </ProgressBarContainer>
         </ProgressBar>
     </Bordered>
 }
 
-export default function Fund({ fund, selected }: { fund: FundRemote, selected?: boolean }) {
-    return <FundStyled key={fund.name} $selected={!!selected}>
-        <GridCell $row={1} $col={"1/3"} className="name">
-            {selected ? fund.name : <Link style={{ display: 'block', width: "100%" }} to={`/detail/${fund.id}`}>{fund.name}</Link>}
+export default function Fund(
+    {
+        fundId,
+    }: {
+        fundId: string,
+
+    }) {
+    const { id, name, budget, balance, syncDate } = useSelector(s => selectFund(s, fundId))
+
+
+    return <FundStyled  $draft={syncDate === undefined}
+    >
+        <GridCell $row={1} $col={1} className="name">
+            {name}
         </GridCell>
-        <Progress value={fund.balance} max={fund.budget} alertPercent={15} />
-        <GridCell $row={3} $col={"1/3"}><TransactionEditor fundId={fund.id} /></GridCell>
+        <GridCell $row={1} $col={2}>
+            {budget.toFixed(2)}
+        </GridCell>
+        <Progress value={balance} max={budget} alertPercent={15} />
+        <GridCell $row={3} $col={"1/3"}>
+            <TransactionEditor fundId={id} />
+        </GridCell>
     </FundStyled>
 }

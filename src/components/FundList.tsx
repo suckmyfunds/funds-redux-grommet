@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { FundRemote } from '../types';
 import FundComponent from './Fund';
+import { Link } from 'react-router-dom';
 
 const List = styled.div`
     display: grid;
@@ -10,17 +10,17 @@ const List = styled.div`
 `
 export default function FundList(
     {
-        funds,
-        selectedId,
+        fundIds,
+
     }: {
-        funds: FundRemote[],
-        selectedId?: string
+        fundIds: string[],
+
     }) {
     return (
         <List>
             {
-                funds.length > 0
-                    ? funds.map((f) => <FundComponent fund={f} key={f.name} selected={f.id === selectedId}/>)
+                fundIds.length > 0
+                    ? fundIds.map((id) => <Link to={`/detail/${id}`}><FundComponent key={id} fundId={id} /></Link>)
                     : <div>No funds</div>
             }
         </List>

@@ -2,7 +2,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 import API, { transformFundFromResponse } from '../api';
 import type { FundRemote } from '../types';
 import { RootState } from "./index";
-import { selectFundTransactions } from "./transactionsSlice";
+import { selectFundTransactions, selectUnsyncedFundTransactions } from "./transactionsSlice";
 
 export const fetchFunds = createAsyncThunk("funds/fetchAll", async (_, { getState }): Promise<FundRemote[]> => {
     const token = (getState() as RootState).auth.token;
@@ -59,19 +59,38 @@ const slice = createSlice({
     }
 });
 
+
 export const fundsSlice = { ...slice, initialState }
 
+
 export const selectStatus = (state: RootState) => state.funds.status;
-export const selectAllFunds = adapter.getSelectors((s: RootState) => s.funds).selectAll
-export const selectLocalFunds = (state: RootState) => adapter.getSelectors().selectAll(state.funds).filter(f => f.syncDate === undefined)
-// [(s, id) => {
-//     return { fund: adapter.getSelectors().selectById(s, id), transactions: selectTransactions(s)(id) }],
-//     ({ fund, transactions }) => ({
-//         ...fund, transactions
-//     })
-export const selectFund = createSelector([
-    adapter.getSelectors((s: RootState) => s.funds).selectById, selectFundTransactions],
-    (fund, transactions) => ({ ...fund, transactions }))
+
+
+const selectors = adapter.getSelectors((s: RootState) => s.funds)
+
+
+export const { selectAll: selectAllFunds, selectIds: selectFundsIds } = selectors
+
+
+export const selectLocalFunds = createSelector(
+    [
+        selectAllFunds
+    ],
+    (funds) => funds.filter(f => f.syncDate === undefined)
+)
+
+
+export const selectFund = createSelector(
+    [
+        adapter.getSelectors((s: RootState) => s.funds).selectById, selectFundTransactions
+    ],
+    (fund, transactions) => ({
+        ...fund,
+        balance: transactions.reduce((a, b) => a - b.amount, 0),
+        transactions
+    })
+)
+
 
 export const selectFundByName = (fundName: string) => (state: RootState) =>
     adapter.getSelectors().selectAll(state.funds).find(f => f.name === fundName)

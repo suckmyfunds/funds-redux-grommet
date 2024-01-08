@@ -7,9 +7,10 @@ type FundProps = React.ComponentProps<typeof Fund>
 const meta: Meta<FundProps> = {
     title: 'components/Fund',
     component: Fund,
-    render: ({ balance, budget, fund }) => {
-        return <Fund 
-        fund={{ ...fund, balance, budget }} />
+    render: ({ fundId }) => {
+        return <Fund
+            fundId={fundId}
+            selected={false} />
     },
     argTypes: {
         balance: {
@@ -42,13 +43,6 @@ type Story = StoryObj<typeof Fund>;
 
 export const Primary: Story = {
     args: {
-        fund: {
-            name: 'Fund 1',
-            budget: 1000,
-            balance: 800,
-            needSync: false,
-            id: "id",
-            syncDate: ""
-        }
+        fundId: "id",
     }
 }

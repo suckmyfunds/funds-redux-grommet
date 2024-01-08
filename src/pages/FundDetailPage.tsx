@@ -1,21 +1,24 @@
 import { useSelector } from "react-redux"
-import { useParams } from "react-router-dom"
-import FundList from "../components/FundList"
-import { selectAllFunds, selectFund } from "../store/fundsSlice"
+import { useNavigate, useParams } from "react-router-dom"
+import Button from "../components/Button"
+import Transaction from "../components/Transaction"
+import { List } from "../components/layout/Flex"
+import { selectFund } from "../store/fundsSlice"
+import FundComponent from "../components/Fund";
 
 export default function FundDetailPage() {
     const { id } = useParams()
-
-    let funds = useSelector(selectAllFunds)
+    const nav = useNavigate()
+    //let fundIds = useSelector(selectFundsIds)
     const fund = useSelector(s => selectFund(s, id!))
+
     return <>
-        <FundList funds={funds} selectedId={id!} />
-        <div>
-            <table>
-                <tbody>
-                    {fund.transactions.map(t => <tr key={t.id}><td>{t.date}</td><td>{t.amount}</td></tr>)}
-                </tbody>
-            </table>
+        <Button onClick={() => nav("/")}>back</Button>
+        <FundComponent fundId={id!}/>
+        <div style={{ marginTop: 20 }}>
+            <List $gap={10}>
+                {fund.transactions.map(t => <Transaction key={t.id} t={t} />)}
+            </List>
         </div>
 
     </>

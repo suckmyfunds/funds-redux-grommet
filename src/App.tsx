@@ -1,8 +1,9 @@
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import { FundsPage } from './pages/FundsPage'
-import FundDetailPage from './pages/FundDetailPage';
-import { syncData } from "./store";
+import { BrowserRouter, Route, Routes, createBrowserRouter } from 'react-router-dom';
 import ActionButton from './components/ActionButton';
+import FundDetailPage from './pages/FundDetailPage';
+import { FundsPage } from './pages/FundsPage';
+import { syncData } from "./store/syncData";
+import { makeMonthIncome } from './store/transactionsSlice';
 
 const router = createBrowserRouter([
   {
@@ -12,14 +13,22 @@ const router = createBrowserRouter([
   {
     path: '/detail/:id',
     element: <FundDetailPage />,
-  }
+  },
 
 ]);
 
 function App() {
   return <div>
     <ActionButton actionCreator={syncData} name="synchronize" />
-    <RouterProvider router={router} />
+    <ActionButton actionCreator={makeMonthIncome} name="make month income" />
+    <BrowserRouter>
+      {/* <AnimatePresence> */}
+        <Routes>
+          <Route path="/" element={<FundsPage />} />
+          <Route path="/detail/:id" element={<FundDetailPage />} />
+        </Routes>
+      {/* </AnimatePresence> */}
+    </BrowserRouter>
   </div>
 }
 
