@@ -1,4 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit"
+import { TransactionRemote } from "../types"
 import { groupBy, median, parseDate } from "../utils"
 import { selectAllFunds } from "./fundsSlice"
 import { selectTransactionsByFundId } from "./transactionsSlice"
@@ -8,7 +9,13 @@ export const selectUnsyncedTransactions = createSelector(
         selectTransactionsByFundId, selectAllFunds
     ],
     (transactions, funds) => {
-        return funds.map(f => ({ [f.name]: transactions[f.id].filter(t => !t.synced) }))
+        return funds.reduce((acc: Record<string, TransactionRemote[]>, fund) => {
+            if (acc[fund.name] === undefined) {
+                acc[fund.name] = []
+            }
+            acc[fund.name].push(...transactions[fund.id].filter(t => !t.synced))
+            return acc
+        }, {})
     }
 )
 
