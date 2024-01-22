@@ -1,0 +1,3 @@
+tools/*.xlsx
+.ipynb_checkpoints/
+.~lock.*.xlsx*
