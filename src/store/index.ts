@@ -1,5 +1,5 @@
 
-import { combineReducers, configureStore, createReducer, nanoid } from "@reduxjs/toolkit";
+import { combineReducers, configureStore, createReducer, createSelector, nanoid } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 import {
     FLUSH,
@@ -14,8 +14,8 @@ import {
 
 import storage from "reduxjs-toolkit-persist/lib/storage";
 import { authSlice } from "./authSlice";
-import { fundsSlice } from "./fundsSlice";
-import { makeMonthIncome, transactionsSlice } from "./transactionsSlice";
+import { fundsSlice, selectFundNamesById } from "./fundsSlice";
+import { makeMonthIncome, selectAllTransactions, transactionsSlice } from "./transactionsSlice";
 import { syncReducer } from "./syncData";
 
 const expireConfig = {
@@ -106,3 +106,5 @@ export {
 
 
 export { authorize } from './authSlice';
+
+

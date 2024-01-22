@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import type { AddSheetResponse, BatchGetResponse, BatchRequest, BatchResponse, Fund, RowData, SpreadSheet, Transaction, UpdateResponse, ValuesRange } from './types';
+import type { AddSheetResponse, BatchGetResponse, BatchRequest, BatchResponse, Fund, RowData, SpreadSheet, Transaction, UpdateCellsRequest, UpdateResponse, ValuesRange } from './types';
 
 const SHEET_ID = "16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ";
 
@@ -18,7 +18,19 @@ const SHEET_ID = "16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ";
 
 // }
 
-export default class GoogleSpreadsheetAPI {
+export interface API {
+  setToken(token: string): void
+  getRows(range: string): Promise<string[][]>
+  appendRow(sheetName: string, rowValues: any[]): Promise<number>
+  appendRows(sheetName: string, rowValues: any[][]): Promise<number>
+  updateRow(sheetName: string, rowValues: any[], rowIndex: number): Promise<number>
+  createSheet(title: string): Promise<AddSheetResponse>
+  batchGet(ranges: string[]): Promise<BatchGetResponse>
+  batchUpdate(requests: BatchRequest[]): Promise<BatchResponse>
+  spreadSheetInfo(fetchData?: string): Promise<SpreadSheet>
+}
+
+export default class GoogleSpreadsheetAPI implements API {
 
   private spreadsheetId: string;
   private token: string
@@ -211,15 +223,12 @@ export default class GoogleSpreadsheetAPI {
 //TODO: use https://github.com/Hookyns/tst-reflect for reflection and auto generation of those functions
 export function transformFundFromResponse(
   vals: string[]
-  // [name, budget, balance, needSync]: FundResponseData
 ): Fund {
-  let [name, budget, balance, needSync] = vals
+  let [name, budget, _, __, initialBalance] = vals
   let result = {
     name,
-    balance: Number.parseFloat(balance),
     budget: Number.parseFloat(budget),
-    needSync: needSync == "TRUE",
-
+    initialBalance: Number.parseFloat(initialBalance)
   };
 
   return result;
@@ -232,7 +241,7 @@ export function transformTransactionFromResponse(vals: string[]): Transaction {
   const amount = parseFloat(amount_.replace(",", "."))
   let type: "EXPENSE" | "INCOME" = "EXPENSE"
 
-  if (type_.toUpperCase() == "INCOME" || amount < 0) {
+  if (type_ === undefined || type_.toUpperCase() == "INCOME" || amount < 0) {
     type = "INCOME"
   }
   // TODO: GET ID 
@@ -247,7 +256,12 @@ export function transformTransactionFromResponse(vals: string[]): Transaction {
 
 
 export function fundToRequest(fund: Fund) {
-  return [fund.name, String(fund.budget), `=B4-SUM(INDIRECT("$A4")&"!$A$2:$A")`, '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))']
+  return [
+    fund.name,
+    String(fund.budget),
+    `=B4-SUM(INDIRECT("$A4")&"!$A$2:$A")`,
+    '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))'
+  ]
 }
 
 
@@ -259,7 +273,7 @@ export function fundToRequestObject(fund: Fund): { rows: RowData } {
         { userEnteredValue: { stringValue: fund.name } },
         { userEnteredValue: { numberValue: fund.budget } },
         { userEnteredValue: { formulaValue: `=B4-SUM(INDIRECT("$A4")&"!$A$2:$A")` } },
-        { userEnteredValue: { formulaValue: '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))' } },
+        { userEnteredValue: { formulaValue: '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))' } }
       ]
     }
   }

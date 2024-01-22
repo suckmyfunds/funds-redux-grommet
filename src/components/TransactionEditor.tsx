@@ -5,6 +5,7 @@ import Grid5 from "./layout/Grid5"
 import GridCell from "./layout/GridCell"
 import styled from "styled-components"
 import { nanoid } from "@reduxjs/toolkit"
+import { dateToExcelFormat } from "../utils"
 
 const FullWidthButton = styled.button`
     width: 100%;
@@ -23,8 +24,7 @@ export default function TransactionEditor({ fundId }: { fundId: string }) {
         dispatch(transactionsSlice.actions.add({
             description,
             amount: parseFloat(amount),
-            // formatted date as "YYYY-MM-DD"
-            date: new Date().toISOString().slice(0, 10),
+            date: dateToExcelFormat(new Date()),
             synced: false,
             id: nanoid(),
             fundId,

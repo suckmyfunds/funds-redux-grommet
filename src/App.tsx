@@ -1,35 +1,33 @@
-import { BrowserRouter, Route, Routes, createBrowserRouter } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import ActionButton from './components/ActionButton';
+import Button from './components/Button';
 import FundDetailPage from './pages/FundDetailPage';
 import { FundsPage } from './pages/FundsPage';
+import SyncPage from './pages/SyncPage';
+import { isSynchronizing } from './store/fundsSlice';
 import { syncData } from "./store/syncData";
 import { makeMonthIncome } from './store/transactionsSlice';
+import StatsPage from './pages/Stats';
+import { clearLocals } from './store/globalActions';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <FundsPage />,
-  },
-  {
-    path: '/detail/:id',
-    element: <FundDetailPage />,
-  },
-
-]);
-
-function App() {
+export default function App() {
+  const navigate = useNavigate();
+  const synchronization = useSelector(isSynchronizing)
   return <div>
-    <ActionButton actionCreator={syncData} name="synchronize" />
-    <ActionButton actionCreator={makeMonthIncome} name="make month income" />
-    <BrowserRouter>
-      {/* <AnimatePresence> */}
-        <Routes>
-          <Route path="/" element={<FundsPage />} />
-          <Route path="/detail/:id" element={<FundDetailPage />} />
-        </Routes>
-      {/* </AnimatePresence> */}
-    </BrowserRouter>
+    <ActionButton actionCreator={syncData}>synchronize</ActionButton>
+    <ActionButton actionCreator={makeMonthIncome}>make month income</ActionButton>
+    <ActionButton actionCreator={clearLocals}>cleanLocal</ActionButton>
+    <Button onClick={() => navigate("/sync")}>sync</Button>
+    <Button onClick={() => navigate("/stats")}>stats</Button>
+    {/* <AnimatePresence> */}
+    <Routes>
+      <Route path="/" element={<FundsPage />} />
+      <Route path="/detail/:id" element={<FundDetailPage />} />
+      <Route path="/sync" element={<SyncPage />} />
+      <Route path="/stats" element={<StatsPage />} />
+    </Routes>
+    {/* </AnimatePresence> */}
+
   </div>
 }
-
-export default App

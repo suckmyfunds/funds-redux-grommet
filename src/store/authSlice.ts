@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { auth } from '../api';
+import { RootState } from "./index"
 
 
 export const authorize = createAsyncThunk("auth/login", async () => {
@@ -9,6 +10,7 @@ export const authorize = createAsyncThunk("auth/login", async () => {
 
 const initialState = { token: "", expiresAt: 0 }
 
+export type AuthState = typeof initialState
 
 const slice = createSlice({
     name: "auth",
@@ -33,6 +35,9 @@ export const authSlice = {
     initialState,
 }
 
-export function selectIsAuthorized(state: { auth: { expiresAt: number } }) {
+export function selectIsAuthorized(state: RootState): boolean {
     return state.auth.expiresAt > Date.now()
+}
+export function selectToken(state: RootState): string {
+    return state.auth.token
 }

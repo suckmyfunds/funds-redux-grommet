@@ -6,6 +6,7 @@ import theme, { colors } from '../theme';
 import DraftStyle from "./DraftStyle";
 import TransactionEditor from "./TransactionEditor";
 import GridCell from "./layout/GridCell";
+import Flex from "./layout/Flex";
 
 const FundStyled = styled(DraftStyle) <{ $selected: boolean }>`
     border-radius: 5px;
@@ -64,6 +65,12 @@ function Progress({ value, max, alertPercent }: { value: number, max: number, al
     </Bordered>
 }
 
+const RedPoint = styled.span`
+    width: 5px;
+    height: 5px;
+    border-radius: 5px;
+    background-color: ${colors.red};
+`
 export default function Fund(
     {
         fundId,
@@ -71,16 +78,23 @@ export default function Fund(
         fundId: string,
 
     }) {
-    const { id, name, budget, balance, syncDate } = useSelector(s => selectFund(s, fundId))
+    
+    const { id, name, budget, balance, syncDate, synced, initialBalance } = useSelector(s => {
+        const fund = selectFund(s, fundId)
+        if (fund.budget === undefined) {
+            console.log("no budget for fund", fundId, s, fund)
+        }
+        return fund
+    })
 
 
-    return <FundStyled  $draft={syncDate === undefined}
+    return <FundStyled $draft={syncDate === undefined}
     >
         <GridCell $row={1} $col={1} className="name">
-            {name}
+            <Flex>{name}{synced ? null : <RedPoint />}</Flex>
         </GridCell>
         <GridCell $row={1} $col={2}>
-            {budget.toFixed(2)}
+            {budget.toFixed(2)}({initialBalance?.toFixed(2)})
         </GridCell>
         <Progress value={balance} max={budget} alertPercent={15} />
         <GridCell $row={3} $col={"1/3"}>

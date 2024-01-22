@@ -1,12 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
+import App from './App'
 import { Provider } from 'react-redux'
 import { store } from './store'
 import { PersistGate } from 'reduxjs-toolkit-persist/integration/react'
 import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import theme from './theme.ts'
 import { persistStore } from 'reduxjs-toolkit-persist'
+import { BrowserRouter } from 'react-router-dom'
 
 const persistor = persistStore(store);
 
@@ -44,7 +45,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <GlobalStyle />
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <App />
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
         </PersistGate>
       </Provider>
     </ThemeProvider>

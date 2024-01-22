@@ -20,7 +20,7 @@ export default function FundList(
         <List>
             {
                 fundIds.length > 0
-                    ? fundIds.map((id) => <Link to={`/detail/${id}`}><FundComponent key={id} fundId={id} /></Link>)
+                    ? fundIds.map((id) => <Link to={`/detail/${id}`} key={id}><FundComponent fundId={id} /></Link>)
                     : <div>No funds</div>
             }
         </List>

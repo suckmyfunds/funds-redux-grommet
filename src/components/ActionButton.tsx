@@ -5,14 +5,14 @@ import { useAppDispatch } from '../store';
 
 export default function ActionButton(
   {
-    actionCreator, name
+    actionCreator, children
   }: {
-    actionCreator: AsyncThunk<any, void, any> | ActionCreator<any>;
-    name: string;
+    actionCreator: AsyncThunk<any, void, any> | ActionCreator<any>,
+    children: React.ReactNode
   }) {
   const dispatch = useAppDispatch();
   const act = useCallback(() => dispatch(actionCreator()), [dispatch]);
   return <Button onClick={act}>
-    {name}
+    {children}
   </Button>;
 }

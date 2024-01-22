@@ -1,111 +1,83 @@
 import { ThunkDispatch, UnknownAction, createAsyncThunk, createReducer } from "@reduxjs/toolkit";
-import API, { fundToRequestObject, transactionToRequestObject, transformTransactionFromResponse } from '../api';
-import { authorize, selectIsAuthorized } from "./authSlice";
-import { fetchFunds, fundsSlice, selectLocalFunds } from "./fundsSlice";
-import { selectLocalTransactions, transactionsSlice } from "./transactionsSlice";
-import { BatchRequest, Fund, FundRemote, TransactionRemote } from "../types";
-import { AppDispatch, type RootState } from ".";
+import { type RootState } from ".";
+import API, { transactionToRequestObject, transformTransactionFromResponse } from '../api';
+import { BatchRequest, TransactionRemote } from "../types";
 import { assert } from "../utils";
+import { authorize, selectIsAuthorized } from "./authSlice";
+import { fundsSlice, selectAllFunds, syncFunds } from "./fundsSlice";
+import { selectLocalTransactions, transactionsSlice } from "./transactionsSlice";
 
-
+/**
+ * Steps:
+ * 1. Authorize
+ * 2. Fetch updates from remote
+ * 3. Select unsynced (local) funds and send to remote
+ * 4. Update Ids for sent funds
+ * 5. Update Ids for transactions of sent funds
+ * 6. Send local transactions
+ * 7. Update transactions ids
+ * 
+ */
 export const syncData = createAsyncThunk(
     "root/sync", async (_, { dispatch, getState }): Promise<void> => {
         dispatch(fundsSlice.actions.setStatus('synchronization'));
 
         let rootState: RootState = getState() as RootState;
 
-        let token = rootState.auth.token;
-        if (!selectIsAuthorized(rootState)) {
-            token = (await dispatch(authorize()).unwrap()).token;
-        }
-        const api = new API(token);
-        const remoteFunds = await dispatch(fetchFunds()).unwrap();
+        const api = await getAuthorizedApi(rootState, dispatch);
 
-
-        const info = await api.spreadSheetInfo();
-        const fundByName = remoteFunds.reduce((acc: Record<string, Fund>, f) => { acc[f.name] = f; return acc; }, {});
-
-        const fundsWithIds = info.sheets.reduce((acc: FundRemote[], sheet) => {
-            if (fundByName[sheet.properties.title]) {
-                acc.push({
-                    ...fundByName[sheet.properties.title],
-                    id: String(sheet.properties.sheetId)
-                });
-            }
-            return acc;
-        }, []);
-        dispatch(fundsSlice.actions.replace(fundsWithIds));
-
-        const transactionsData = (await api.batchGet(remoteFunds.map(f => `${f.name}!A2:D`)))
-            .valueRanges.flatMap((v, idx): TransactionRemote[] => {
-                return v.values.map((tr, id) => {
-                    const transaction= transformTransactionFromResponse(tr)
-                    return {
-                        ...transaction,
-                        syncDate: new Date().toISOString(),
-                        fundId: fundsWithIds[idx].id,
-                        id: String(10000000 + idx * 10000000 + id)
-                    }
-                });
-            });
-
-        // TODO: when implement transactions synchronization replace the 'replace' action with transactionsSlice.actions.addMany
-        dispatch(transactionsSlice.actions.replace(transactionsData));
-
-        let requests: BatchRequest[] = [];
-
-        const localFunds = selectLocalFunds(rootState);
-
-        if (localFunds.length > 0) {
-            requests.push({
-                appendCells: {
-                    sheetId: 0,
-                    rows: {
-                        values: localFunds.flatMap(f => fundToRequestObject(f).rows.values)
-                    },
-                    fields: "userEnteredValue"
-                }
-            });
-        }
-        requests.concat(localFunds.map((f) => {
-            return {
-                addSheet: {
-                    properties: {
-                        title: f.name
-                    }
-                }
-            };
-        }));
-
-        if (requests.length > 0) {
-
-            const response = await api.batchUpdate(requests);
-            const [createdFunds, ...fundTransactionsPages] = response.replies;
-            console.log(createdFunds);
-            console.log(fundTransactionsPages);
-            // TODO: update fund IDs,
-            // match by index localFunds and fundTransactionsPages
-            // make the update action which finds transaction with fundID from localFunds and replace it with ID from fundTransactionsPage
-        }
-
-        // await syncTransactions(rootState, api, dispatch);
+        await (dispatch(syncFunds()).unwrap())
+        // name, index should match with remote
+        await syncTransactions(rootState, api, dispatch);
 
         dispatch(fundsSlice.actions.setStatus('idle'));
     }
 )
 
+const getAuthorizedApi = async (rootState: RootState, dispatch: ThunkDispatch<unknown, unknown, UnknownAction>): Promise<API> => {
+    let token = rootState.auth.token;
+    if (!selectIsAuthorized(rootState)) {
+        token = (await dispatch(authorize()).unwrap()).token;
+    }
+    return new API(token);
+}
+
+
 export async function syncTransactions(rootState: RootState, api: API, dispatch: ThunkDispatch<unknown, unknown, UnknownAction>) {
     let requests: BatchRequest[] = []
+
+    const funds = selectAllFunds(rootState);
+
+    let remoteTransactions = (await api.batchGet(funds.map(f => `${f.name}!A2:E`)))
+        .valueRanges.flatMap((v, idx): TransactionRemote[] => {
+            return v.values.map((tr, id) => {
+                const transaction = transformTransactionFromResponse(tr)
+                return {
+                    ...transaction,
+                    syncDate: new Date().toISOString(),
+                    fundId: funds[idx].id,
+                    id: String(10000000 + idx * 10000000 + id)
+                }
+            });
+        });
+
     // TODO: we need to append local transactions, and resolve conflicts with local transactions
     // remote and local transaction conflicts if they have same date and same amout
     // if we see conflict - we need to note user that we merge them
     const localTransactions = selectLocalTransactions(rootState)
+    let transactionsToSync = []
+    for (let transaction of localTransactions) {
 
-    if (localTransactions.length > 0) {
-        const transactionsByFundId = localTransactions.reduce((groups: Record<string, TransactionRemote[]>, t) => {
+        if (remoteTransactions.findIndex(t => t.date === transaction.date && t.amount === transaction.amount) == -1) {
+            transactionsToSync.push(transaction)
+        }
+    }
+
+    if (transactionsToSync.length > 0) {
+        const transactionsByFundId = transactionsToSync.reduce((groups: Record<string, TransactionRemote[]>, t) => {
             // skip transactions for unsyncd fund
             // TODO: sync fund first and then transactions
-            assert(parseInt(t.fundId) < 0, "fund unsynced fund")
+            assert(parseInt(t.fundId) > 0, `fund unsynced fund: ${t.fundId}, ${parseInt(t.fundId)} ${t}`)
 
             if (!groups[t.fundId]) {
                 groups[t.fundId] = []
@@ -114,7 +86,7 @@ export async function syncTransactions(rootState: RootState, api: API, dispatch:
             return groups
         }, {})
 
-        requests.concat(Object.keys(transactionsByFundId).map(key => {
+        requests = requests.concat (Object.keys(transactionsByFundId).map(key => {
             const trs = transactionsByFundId[key]
             return {
                 appendCells: {
@@ -128,13 +100,27 @@ export async function syncTransactions(rootState: RootState, api: API, dispatch:
         }))
     }
     if (requests.length > 0) {
-
         const response = await api.batchUpdate(requests)
-        const [createdFunds, ...fundTransactionsPages] = response.replies
-        console.log(createdFunds)
+        const fundTransactionsPages = response.replies
         console.log(fundTransactionsPages)
     }
+
+    // TODO: more effective sync. Maybe try to merge remoteTransactions with fundTransactionsPages
+    remoteTransactions = (await api.batchGet(funds.map(f => `${f.name}!A2:D`)))
+        .valueRanges.flatMap((v, idx): TransactionRemote[] => {
+            return v.values.map((tr, id) => {
+                const transaction = transformTransactionFromResponse(tr)
+                return {
+                    ...transaction,
+                    syncDate: new Date().toISOString(),
+                    fundId: funds[idx].id,
+                    id: String(10000000 + idx * 10000000 + id)
+                }
+            });
+        });
+    dispatch(transactionsSlice.actions.replace(remoteTransactions))
 }
+
 
 
 let initialState = { [fundsSlice.reducerPath]: { status: 'idle' } }

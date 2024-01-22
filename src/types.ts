@@ -18,7 +18,7 @@ export interface Notification {
 export interface Fund {
     name: string
     budget: number
-    needSync: boolean
+    initialBalance: number
 }
 export type FundCreate = Omit<Fund, "needSync">
 
