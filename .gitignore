@@ -1,3 +1,5 @@
 tools/*.xlsx
 .ipynb_checkpoints/
 .~lock.*.xlsx*
+dist/
+dev-dist/
