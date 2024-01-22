@@ -1,12 +1,11 @@
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { selectFund } from "../store/fundsSlice";
 import theme, { colors } from '../theme';
 import DraftStyle from "./DraftStyle";
 import TransactionEditor from "./TransactionEditor";
-import GridCell from "./layout/GridCell";
 import Flex from "./layout/Flex";
+import GridCell from "./layout/GridCell";
 
 const FundStyled = styled(DraftStyle) <{ $selected: boolean }>`
     border-radius: 5px;
@@ -78,7 +77,7 @@ export default function Fund(
         fundId: string,
 
     }) {
-    
+
     const { id, name, budget, balance, syncDate, synced, initialBalance } = useSelector(s => {
         const fund = selectFund(s, fundId)
         if (fund.budget === undefined) {
@@ -88,7 +87,7 @@ export default function Fund(
     })
 
 
-    return <FundStyled $draft={syncDate === undefined}
+    return <FundStyled $draft={syncDate === undefined} $selected={false}
     >
         <GridCell $row={1} $col={1} className="name">
             <Flex>{name}{synced ? null : <RedPoint />}</Flex>
