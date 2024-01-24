@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import FundComponent from './Fund';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Box, Grid } from 'grommet';
 
 const List = styled.div`
     display: grid;
@@ -16,13 +17,14 @@ export default function FundList(
         fundIds: string[],
 
     }) {
+    const navigate = useNavigate()
     return (
-        <List>
+        <Grid columns="medium" gap="medium">
             {
                 fundIds.length > 0
-                    ? fundIds.map((id) => <Link to={`/detail/${id}`} key={id}><FundComponent fundId={id} /></Link>)
+                    ? fundIds.map((id) => <FundComponent fundId={id} onClick={() => navigate(`/detail/${id}`)} />)
                     : <div>No funds</div>
             }
-        </List>
+        </Grid>
     )
 }

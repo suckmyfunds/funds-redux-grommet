@@ -5,14 +5,15 @@ import { useAppDispatch } from '../store';
 
 export default function ActionButton(
   {
-    actionCreator, children
+    actionCreator, label,
+    disabled
   }: {
     actionCreator: AsyncThunk<any, void, any> | ActionCreator<any>,
-    children: React.ReactNode
+    label: string,
+    disabled?: boolean
   }) {
   const dispatch = useAppDispatch();
   const act = useCallback(() => dispatch(actionCreator()), [dispatch]);
-  return <Button onClick={act}>
-    {children}
+  return <Button onClick={act} label={label} disabled={disabled}>
   </Button>;
 }

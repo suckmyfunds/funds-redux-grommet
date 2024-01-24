@@ -1,15 +1,10 @@
+import { nanoid } from "@reduxjs/toolkit"
+import { Box, Button, TextInput } from "grommet"
 import { useCallback, useState } from "react"
 import { useAppDispatch } from "../store"
 import { transactionsSlice } from "../store/transactionsSlice"
-import Grid5 from "./layout/Grid5"
-import GridCell from "./layout/GridCell"
-import styled from "styled-components"
-import { nanoid } from "@reduxjs/toolkit"
 import { dateToExcelFormat } from "../utils"
 
-const FullWidthButton = styled.button`
-    width: 100%;
-`
 const floatRegExp = new RegExp("^[0-9]*[.,]?[0-9]{0,2}$")
 
 export default function TransactionEditor({ fundId }: { fundId: string }) {
@@ -43,20 +38,16 @@ export default function TransactionEditor({ fundId }: { fundId: string }) {
 
     }
 
-    return <Grid5 $rows={2} $cols={2}>
-        <GridCell $row={1} $col={1}>
-            <input type="text" placeholder="amount" name="amount" value={amount} onChange={onChangeAmount}
+    return <Box gap="small">
+        <Box flex direction="row" gap="small">
+            <TextInput type="text" placeholder="amount" name="amount" value={amount} onChange={onChangeAmount}
                 autoFocus={true}
                 onKeyUp={e => e.key === "Enter" && onClick(e)}
             />
-        </GridCell>
-        <GridCell $row={1} $col={2}>
-            <input type="text" placeholder="description" name="desctiprion" value={description} onChange={e => setDescription(e.target.value)} />
-        </GridCell>
-        <GridCell $row={2} $col={"1/3"}>
-            <FullWidthButton onClick={onClick}>Add</FullWidthButton>
-        </GridCell>
-    </Grid5>
+            <TextInput type="text" placeholder="description" name="desctiprion" value={description} onChange={e => setDescription(e.target.value)} />
+        </Box>
+        <Box><Button onClick={onClick} label="Add"/></Box>
+    </Box>
 
 
 }

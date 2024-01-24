@@ -14,9 +14,6 @@ export function FundsPage() {
         return <div>Synchronizing...</div>
     }
 
-    return <>
-
-        <FundList fundIds={fundIds}/>
-    </>
+    return <FundList fundIds={fundIds}/>
 
 }

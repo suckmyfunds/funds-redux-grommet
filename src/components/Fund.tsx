@@ -1,25 +1,11 @@
+import { Box, Card, Grid, Meter, Text, Tip } from "grommet";
+import React, { useCallback } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
 import { selectFund } from "../store/fundsSlice";
-import theme, { colors } from '../theme';
-import DraftStyle from "./DraftStyle";
+import { colors } from '../theme';
 import TransactionEditor from "./TransactionEditor";
-import Flex from "./layout/Flex";
 import GridCell from "./layout/GridCell";
-
-const FundStyled = styled(DraftStyle) <{ $selected: boolean }>`
-    border-radius: 5px;
-    background-color: ${props => props.$selected ? colors.lightBlue : colors.white};
-    display: grid;
-
-    grid-template-columns: 3fr 1fr;
-    grid-column-gap: calc(${theme.contentPadding}*3);
-    grid-template-rows:  1fr 1fr auto;
-    grid-row-gap: calc(${theme.contentPadding}*1);
-
-    padding: ${theme.contentPadding};
-    box-shadow: 1px 3px 5px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.24);
-`
 
 
 const colorMap = (value: number, max: number, alert: number, colors: { overflow: string, alert: string, normal: string, negative: string }) => {
@@ -73,9 +59,10 @@ const RedPoint = styled.span`
 export default function Fund(
     {
         fundId,
+        onClick
     }: {
         fundId: string,
-
+        onClick?: () => void
     }) {
 
     const { id, name, budget, balance, syncDate, synced, initialBalance } = useSelector(s => {
@@ -85,19 +72,40 @@ export default function Fund(
         }
         return fund
     })
+    const handleOnClick = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation()
+        e.preventDefault()
+        onClick && onClick()
+    }, [onClick])
 
+    return <Card onClick={handleOnClick}>
+        <Grid
+            rows={["auto", "3fr", "auto"]}
+            pad={"20px"}
+            columns={["3fr", "1fr"]}
+            gap={"10px"}
+            areas={[
+                { name: "name", start: [0, 0], end: [2, 0] },
+                { name: "balance", start: [0, 1], end: [2, 1] },
+                { name: "transactions", start: [0, 2], end: [2, 2] }
 
-    return <FundStyled $draft={syncDate === undefined} $selected={false}
-    >
-        <GridCell $row={1} $col={1} className="name">
-            <Flex>{name}{synced ? null : <RedPoint />}</Flex>
-        </GridCell>
-        <GridCell $row={1} $col={2}>
-            {budget.toFixed(2)}({initialBalance?.toFixed(2)})
-        </GridCell>
-        <Progress value={balance} max={budget} alertPercent={15} />
-        <GridCell $row={3} $col={"1/3"}>
-            <TransactionEditor fundId={id} />
-        </GridCell>
-    </FundStyled>
+            ]}
+        >
+            <Box gridArea="name" direction="row" flex fill="horizontal" >
+                <Box flex direction="row">
+                    {name}{synced ? null : <RedPoint />}
+                </Box>
+                <Box>
+                    {budget.toFixed(2)}({initialBalance?.toFixed(2)})
+                </Box>
+            </Box>
+            <Box gridArea="balance" gap="small">
+                    <Meter value={balance} max={budget} thickness="small"/>
+                <Box gridArea="transactions">
+                    <TransactionEditor fundId={id} />
+                </Box>
+            </Box>
+        </Grid>
+
+    </Card>
 }

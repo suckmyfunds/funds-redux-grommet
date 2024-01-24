@@ -50,8 +50,8 @@ export default function () {
                             <h3>{fundName}</h3>
                             <GlassTable >
                                 <tbody>
-                                    {trs.map((t, idx) => <tr key={t.id}>
-                                        <td><ActionButton actionCreator={() => makeTransactionSync(t.id)}>sync</ActionButton ></td>
+                                    {trs.map((t) => <tr key={t.id}>
+                                        <td><ActionButton actionCreator={() => makeTransactionSync(t.id)} label="sync" /></td>
                                         <td>{t.date}</td>
                                         <td>{t.amount}</td>
                                         <td>({t.description ? t.description : "???"})</td>

@@ -1,26 +1,13 @@
-import React from 'react'
+import { Grommet, dark, grommet } from 'grommet'
 import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
+import { BrowserRouter } from 'react-router-dom'
+import { persistStore } from 'reduxjs-toolkit-persist'
 import { PersistGate } from 'reduxjs-toolkit-persist/integration/react'
 import App from './App'
 import { store } from './store'
-import { Grommet, grommet } from 'grommet'
-import { BrowserRouter } from 'react-router-dom'
-import { persistStore } from 'reduxjs-toolkit-persist'
 
 const persistor = persistStore(store);
-
-const theme = {
-  global: {
-    font: {
-      family: 'Roboto',
-      size: '14px',
-      height: '20px',
-    },
-  },
-};
-
-
 
 //@ts-ignore
 ReactDOM.createRoot(document.getElementById('root')!).render(
