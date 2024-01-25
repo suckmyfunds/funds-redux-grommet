@@ -61,9 +61,7 @@ export const syncFunds = createAsyncThunk("funds/sync", async (_, { getState, di
         requests.push({
             appendCells: {
                 sheetId: mainSheetIdx,
-                rows: {
-                    values: unsyncedFunds.flatMap(f => fundToRequestObject(f).rows.values)
-                },
+                rows: unsyncedFunds.flatMap(f => fundToRequestObject(f)),
                 fields: "userEnteredValue"
             }
         });

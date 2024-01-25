@@ -103,7 +103,7 @@ export interface RowData {
 
 export type UpdateCellsRequest = {
     updateCells: {
-        rows: RowData,
+        rows: RowData[],
         fields: string,
         area: {
             start:
@@ -118,7 +118,7 @@ export type UpdateCellsRequest = {
 export type AppendCellsRequest = {
     appendCells: {
         sheetId: number,
-        rows: RowData,
+        rows: RowData[],
         fields: string
     }
 }

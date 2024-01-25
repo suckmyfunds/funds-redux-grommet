@@ -1,7 +1,7 @@
 import { ThunkDispatch, UnknownAction, createAsyncThunk, createReducer } from "@reduxjs/toolkit";
 import { type RootState } from ".";
 import API, { transactionToRequestObject, transformTransactionFromResponse } from '../api';
-import { BatchRequest, TransactionRemote } from "../types";
+import { AppendCellsRequest, BatchRequest, TransactionRemote } from "../types";
 import { assert } from "../utils";
 import { authorize, selectIsAuthorized } from "./authSlice";
 import { fundsSlice, selectAllFunds, syncFunds } from "./fundsSlice";
@@ -86,18 +86,17 @@ export async function syncTransactions(rootState: RootState, api: API, dispatch:
             return groups
         }, {})
 
-        requests = requests.concat (Object.keys(transactionsByFundId).map(key => {
-            const trs = transactionsByFundId[key]
-            return {
-                appendCells: {
-                    sheetId: parseInt(key),
-                    rows: {
-                        values: trs.flatMap(t => transactionToRequestObject(t).rows.values)
-                    },
-                    fields: "userEnteredValue"
+
+        requests = requests.concat(
+            Object.keys(transactionsByFundId).map(key => {
+                return {
+                    appendCells: {
+                        sheetId: parseInt(key),
+                        rows: transactionsByFundId[key].map(t => transactionToRequestObject(t)),
+                        fields: "userEnteredValue"
+                    }
                 }
-            }
-        }))
+            }))
     }
     if (requests.length > 0) {
         const response = await api.batchUpdate(requests)

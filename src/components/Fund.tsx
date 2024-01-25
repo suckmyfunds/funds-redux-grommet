@@ -1,61 +1,15 @@
-import { Box, Card, Grid, Meter, Text, Tip } from "grommet";
+import { nanoid } from "@reduxjs/toolkit";
+import { Box, Card, Grid, Stack, Text } from "grommet";
 import React, { useCallback } from "react";
 import { useSelector } from "react-redux";
-import styled from "styled-components";
+import { useAppDispatch } from "../store";
 import { selectFund } from "../store/fundsSlice";
-import { colors } from '../theme';
+import { transactionsSlice } from "../store/transactionsSlice";
+import { dateToExcelFormat } from "../utils";
+import BudgetBar from "./BudgetBar";
 import TransactionEditor from "./TransactionEditor";
-import GridCell from "./layout/GridCell";
 
 
-const colorMap = (value: number, max: number, alert: number, colors: { overflow: string, alert: string, normal: string, negative: string }) => {
-    if (value > max) {
-        return colors.overflow
-    } else if (value < 0 || value === 0) {
-        return colors.negative
-    } else if (value <= alert) {
-        return colors.alert
-    } else {
-        return colors.normal
-    }
-}
-
-const fgColorMap = { negative: colors.red, alert: colors.black, normal: colors.black, overflow: colors.white }
-const bgColorMap = { negative: colors.red, alert: colors.yellow, normal: colors.gray, overflow: colors.blue }
-
-const ProgressBar = styled.div<{
-    $progress: number,
-    $alertPercent: number,
-}>`
-    color: ${props => colorMap(props.$progress, 100, props.$alertPercent, fgColorMap)};
-    background-color: ${props => colorMap(props.$progress, 100, props.$alertPercent, bgColorMap)};
-    width: ${props => Math.max(Math.min(100, props.$progress), 0)}%;
-    border-radius: 2px;
-`
-const Bordered = styled(GridCell)`
-    border: 1px solid black;
-    border-radius: 3px;
-`
-const ProgressBarContainer = styled.div`
-    padding: 0 5px 0 5px;
-`
-
-function Progress({ value, max, alertPercent }: { value: number, max: number, alertPercent: number }) {
-    return <Bordered $row={2} $col={"1/3"}>
-        <ProgressBar $alertPercent={alertPercent} $progress={value / (max / 100)} >
-            <ProgressBarContainer>
-                {value < max ? value.toFixed(2) : `${value.toFixed(2)} (+${(value - max).toFixed(2)})`}
-            </ProgressBarContainer>
-        </ProgressBar>
-    </Bordered>
-}
-
-const RedPoint = styled.span`
-    width: 5px;
-    height: 5px;
-    border-radius: 5px;
-    background-color: ${colors.red};
-`
 export default function Fund(
     {
         fundId,
@@ -65,20 +19,28 @@ export default function Fund(
         onClick?: () => void
     }) {
 
-    const { id, name, budget, balance, syncDate, synced, initialBalance } = useSelector(s => {
-        const fund = selectFund(s, fundId)
-        if (fund.budget === undefined) {
-            console.log("no budget for fund", fundId, s, fund)
-        }
-        return fund
-    })
+    const { name, budget, balance, synced, initialBalance } = useSelector(s => selectFund(s, fundId))
+        console.log("show fund", name, budget, balance)
     const handleOnClick = useCallback((e: React.MouseEvent) => {
         e.stopPropagation()
         e.preventDefault()
         onClick && onClick()
     }, [onClick])
 
-    return <Card onClick={handleOnClick}>
+    const dispatch = useAppDispatch()
+    const createTransaction = useCallback(({ description, amount }: { description: string, amount: string }) => {
+        dispatch(transactionsSlice.actions.add({
+            description,
+            amount: parseFloat(amount),
+            date: dateToExcelFormat(new Date()),
+            synced: false,
+            id: nanoid(),
+            fundId,
+            type: "EXPENSE"
+        }))
+    }, [dispatch])
+
+    return <Card>
         <Grid
             rows={["auto", "3fr", "auto"]}
             pad={"20px"}
@@ -91,19 +53,24 @@ export default function Fund(
 
             ]}
         >
-            <Box gridArea="name" direction="row" flex fill="horizontal" >
+            <Box gridArea="name" direction="row" flex fill="horizontal" onClick={handleOnClick} wrap>
                 <Box flex direction="row">
-                    {name}{synced ? null : <RedPoint />}
+                    <Stack>
+                        <Text>{name}</Text>
+                        {synced && <Box background="status-critical" pad={{ horizontal: 'xsmall' }} round>
+                        </Box>}
+                    </Stack>
                 </Box>
                 <Box>
                     {budget.toFixed(2)}({initialBalance?.toFixed(2)})
                 </Box>
             </Box>
             <Box gridArea="balance" gap="small">
-                    <Meter value={balance} max={budget} thickness="small"/>
-                <Box gridArea="transactions">
-                    <TransactionEditor fundId={id} />
-                </Box>
+                <BudgetBar budget={budget} balance={balance} warnPercent={15} />
+            </Box>
+
+            <Box gridArea="transactions">
+                <TransactionEditor onSubmit={createTransaction} />
             </Box>
         </Grid>
 

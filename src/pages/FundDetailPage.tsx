@@ -2,8 +2,7 @@ import { useSelector } from "react-redux"
 import { useNavigate, useParams } from "react-router-dom"
 import Button from "../components/Button"
 import FundComponent from "../components/Fund"
-import Transaction from "../components/Transaction"
-import { List } from "../components/layout/Flex"
+import TransactionsTable from "../components/TransactionsTable"
 import { selectFundTransactions } from "../store/transactionsSlice"
 
 export default function FundDetailPage() {
@@ -15,9 +14,7 @@ export default function FundDetailPage() {
         <Button onClick={() => nav("/")}>back</Button>
         <FundComponent fundId={id!} />
         <div style={{ marginTop: 20 }}>
-            <List $gap={10}>
-                {transactions.map(t => <Transaction key={t.id} t={t} />)}
-            </List>
+            <TransactionsTable data={transactions}/>
         </div>
 
     </>

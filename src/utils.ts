@@ -30,9 +30,6 @@ export function assert(condition: boolean, msg: string) {
     }
 }
 
-export function dateToExcelFormat(date: Date): string {
-    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`
-}
 
 export function median(numbers: number[]) {
     numbers.sort((a, b) => a - b); // Sort the array in ascending order
@@ -63,8 +60,25 @@ export function groupBy<T>(array: T[], predicate: Predicate<T>): { [key: string]
 }
 
 
-export function parseDate(dateString: string): Date {
+export function dateToExcelFormat(date: Date): string {
+    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
+}
+
+export function parseExcelDate(dateString: string): Date {
     const [day, month, year] = dateString.split('.').map(Number);
     // Months in JavaScript's Date object are 0-indexed, so we subtract 1 from the month
-    return new Date(year, month - 1, day);
+    return new Date(year, month-1, day);
   }
+
+export function compareDates(a: Date, b: Date)
+{
+    const yearComparison = a.getFullYear() - b.getFullYear();
+    if (yearComparison !== 0) {
+        return yearComparison
+    }
+    const monthComparison = a.getMonth() - b.getMonth();
+    if (monthComparison !== 0) {
+        return monthComparison
+    }
+    return a.getDate() - b.getDate();
+}

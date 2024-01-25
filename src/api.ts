@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import type { AddSheetResponse, BatchGetResponse, BatchRequest, BatchResponse, Fund, RowData, SpreadSheet, Transaction, UpdateCellsRequest, UpdateResponse, ValuesRange } from './types';
+import type { AddSheetResponse, BatchGetResponse, BatchRequest, BatchResponse, Fund, RowData, SpreadSheet, Transaction, UpdateResponse, ValuesRange } from './types';
 
 const SHEET_ID = "16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ";
 
@@ -265,17 +265,14 @@ export function fundToRequest(fund: Fund) {
 }
 
 
-export function fundToRequestObject(fund: Fund): { rows: RowData } {
+export function fundToRequestObject(fund: Fund): RowData {
   return {
-    rows:
-    {
-      values: [
-        { userEnteredValue: { stringValue: fund.name } },
-        { userEnteredValue: { numberValue: fund.budget } },
-        { userEnteredValue: { formulaValue: `=B4-SUM(INDIRECT("$A4")&"!$A$2:$A")` } },
-        { userEnteredValue: { formulaValue: '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))' } }
-      ]
-    }
+    values: [
+      { userEnteredValue: { stringValue: fund.name } },
+      { userEnteredValue: { numberValue: fund.budget } },
+      { userEnteredValue: { formulaValue: `=B4-SUM(INDIRECT("$A4")&"!$A$2:$A")` } },
+      { userEnteredValue: { formulaValue: '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))' } }
+    ]
   }
 }
 
@@ -285,16 +282,15 @@ export function transactionToRequest(transaction: Transaction) {
 }
 
 
-export function transactionToRequestObject(transaction: Transaction): { rows: RowData } {
+export function transactionToRequestObject(transaction: Transaction): RowData {
   return {
-    rows: {
-      values: [
-        { userEnteredValue: { numberValue: transaction.amount } },
-        { userEnteredValue: { stringValue: transaction.date } },
-        { userEnteredValue: { stringValue: transaction.description } },
-        { userEnteredValue: { boolValue: transaction.synced } },
-      ]
-    }
+
+    values: [
+      { userEnteredValue: { numberValue: transaction.amount } },
+      { userEnteredValue: { stringValue: transaction.date } },
+      { userEnteredValue: { stringValue: transaction.description } },
+      { userEnteredValue: { boolValue: transaction.synced } },
+    ]
   }
 }
 
