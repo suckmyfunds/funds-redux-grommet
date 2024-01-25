@@ -1,7 +1,19 @@
-import axios, { AxiosError } from 'axios';
-import type { AddSheetResponse, BatchGetResponse, BatchRequest, BatchResponse, Fund, RowData, SpreadSheet, Transaction, UpdateResponse, ValuesRange } from './types';
+import axios, { AxiosError } from 'axios'
 
-const SHEET_ID = "16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ";
+import type {
+  AddSheetResponse,
+  BatchGetResponse,
+  BatchRequest,
+  BatchResponse,
+  Fund,
+  RowData,
+  SpreadSheet,
+  Transaction,
+  UpdateResponse,
+  ValuesRange,
+} from './types'
+
+const SHEET_ID = '16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ'
 
 // function withDebounce<F extends AnyFunction>(f: AnyFunction) {
 //   let debuonced = false
@@ -31,143 +43,138 @@ export interface API {
 }
 
 export default class GoogleSpreadsheetAPI implements API {
-
-  private spreadsheetId: string;
+  private spreadsheetId: string
   private token: string
 
   constructor(token: string) {
-    this.spreadsheetId = SHEET_ID;
+    this.spreadsheetId = SHEET_ID
     this.token = token
   }
   private basicFetch = async (method: string, url: string, body: any = null, params: any = {}): Promise<any> => {
     try {
-      const response: { status: number, data: any } = await axios({
+      const response: { status: number; data: any } = await axios({
         url,
         method: method,
         data: body,
         params: params,
         headers: {
           Authorization: `Bearer ${this.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+          'Content-Type': 'application/json',
+        },
+      })
       if (response.status >= 400) {
         // @ts-ignore
-        throw new AxiosError('Failed to fetch data.', undefined, undefined, null, response);
+        throw new AxiosError('Failed to fetch data.', undefined, undefined, null, response)
       }
-      return response.data;
-
+      return response.data
     } catch (error) {
-      let err = error as AxiosError;
-      let content: object | string = ""
+      let err = error as AxiosError
+      let content: object | string = ''
       if (err.response?.status == 400) {
         // @ts-ignore
         content = err.response.data.error.message
-      }
-      else {
+      } else {
         content = err.response ? (err.response.data ? err.response.data : err.response) : err
-        console.error('Error basic fetch:', content);
+        console.error('Error basic fetch:', content)
       }
-      throw content;
+      throw content
     }
   }
 
   setToken = (t: string) => {
-    this.token = t;
+    this.token = t
   }
 
   appendRow = async (sheetName: string, rowValues: any[]): Promise<number> => {
     try {
       const response: UpdateResponse | undefined = await this.basicFetch(
-        "POST",
+        'POST',
         `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${sheetName}!A:A:append`,
         {
-          values: [rowValues]
+          values: [rowValues],
         },
         {
           valueInputOption: 'USER_ENTERED',
           insertDataOption: 'INSERT_ROWS',
-          includeValuesInResponse: false
+          includeValuesInResponse: false,
         }
-      );
+      )
       if (!response) {
         return -1
       }
-      let range = response.updates.updatedRange as string;
+      let range = response.updates.updatedRange as string
       // get row number of appenden row
-      return Number.parseInt(range.split("!")[1].split(":")[0].substring(1))
-
+      return Number.parseInt(range.split('!')[1].split(':')[0].substring(1))
     } catch (error) {
-      console.error('Error appending row:', error);
-      throw error;
+      console.error('Error appending row:', error)
+      throw error
     }
   }
 
   appendRows = async (sheetName: string, rowValues: any[][]): Promise<number> => {
     try {
       const response: UpdateResponse = await this.basicFetch(
-        "POST",
+        'POST',
         `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${sheetName}!A:A:append`,
         {
-          values: rowValues
+          values: rowValues,
         },
         {
           valueInputOption: 'USER_ENTERED',
           insertDataOption: 'INSERT_ROWS',
-          includeValuesInResponse: false
+          includeValuesInResponse: false,
         }
-      );
+      )
 
-      let range = response.updates.updatedRange as string;
-      return Number.parseInt(range.split("!")[1].split(":")[0].substring(1))
-
+      let range = response.updates.updatedRange as string
+      return Number.parseInt(range.split('!')[1].split(':')[0].substring(1))
     } catch (error) {
-      console.error('Error appending row:', error);
-      throw error;
+      console.error('Error appending row:', error)
+      throw error
     }
   }
 
   updateRow = async (sheetName: string, rowValues: any[], rowIndex: number): Promise<number> => {
     try {
       const response: UpdateResponse = await this.basicFetch(
-        "PUT",
+        'PUT',
         `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${sheetName}!A${rowIndex}:C${rowIndex}`,
         {
-          values: [rowValues]
+          values: [rowValues],
         },
         {
-          valueInputOption: 'USER_ENTERED'
+          valueInputOption: 'USER_ENTERED',
         }
-      );
+      )
 
-      let range = response.updates.updatedRange as string;
+      let range = response.updates.updatedRange as string
       // getting row number
-      return Number.parseInt(range.split("!")[1].split(":")[0].substring(1))
+      return Number.parseInt(range.split('!')[1].split(':')[0].substring(1))
     } catch (error) {
-      console.error('Error updating row:', error);
-      throw error;
+      console.error('Error updating row:', error)
+      throw error
     }
   }
 
   getRows = async (ref: string): Promise<string[][]> => {
     try {
-      console.log("getRows")
+      console.log('getRows')
       const response: ValuesRange = await this.basicFetch(
-        "GET",
+        'GET',
         `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/${ref}`
-      );
+      )
 
-      return response.values || [];
+      return response.values || []
     } catch (error: any) {
-      console.error('Error getting row:', error);
-      throw error;
+      console.error('Error getting row:', error)
+      throw error
     }
   }
 
   batchGet = async (ranges: string[]): Promise<BatchGetResponse> => {
     return await this.basicFetch(
-      "GET",
-      `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values:batchGet?ranges=${ranges.join("&ranges=")}`,
+      'GET',
+      `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values:batchGet?ranges=${ranges.join('&ranges=')}`
     )
   }
 
@@ -176,10 +183,10 @@ export default class GoogleSpreadsheetAPI implements API {
       {
         addSheet: {
           properties: {
-            title: name
-          }
-        }
-      }
+            title: name,
+          },
+        },
+      },
     ])
     return response.replies[0] as AddSheetResponse
   }
@@ -187,18 +194,18 @@ export default class GoogleSpreadsheetAPI implements API {
   batchUpdate = async (requests: BatchRequest[]): Promise<BatchResponse> => {
     try {
       const response: BatchResponse = await this.basicFetch(
-        "POST",
+        'POST',
         `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}:batchUpdate`,
         {
           requests: requests,
           includeSpreadsheetInResponse: false,
         }
-      );
+      )
 
-      return response;
+      return response
     } catch (error: any) {
-      console.error('Error getting row:', error.response?.data);
-      throw error.response?.data;
+      console.error('Error getting row:', error.response?.data)
+      throw error.response?.data
     }
   }
 
@@ -209,61 +216,54 @@ export default class GoogleSpreadsheetAPI implements API {
     }
 
     try {
-      const response = await this.basicFetch("GET", uri);
+      const response = await this.basicFetch('GET', uri)
       return response
     } catch (error: any) {
-      console.error('Error getting row:', error.response?.data);
-      throw error.response?.data;
+      console.error('Error getting row:', error.response?.data)
+      throw error.response?.data
     }
-
   }
 }
 
-
 //TODO: use https://github.com/Hookyns/tst-reflect for reflection and auto generation of those functions
-export function transformFundFromResponse(
-  vals: string[]
-): Fund {
+export function transformFundFromResponse(vals: string[]): Fund {
   let [name, budget, _, __, initialBalance] = vals
   let result = {
     name,
     budget: Number.parseFloat(budget),
-    initialBalance: Number.parseFloat(initialBalance)
-  };
+    initialBalance: Number.parseFloat(initialBalance),
+  }
 
-  return result;
+  return result
 }
-
 
 //TODO: use https://github.com/Hookyns/tst-reflect for reflection and auto generation of those functions
 export function transformTransactionFromResponse(vals: string[]): Transaction {
   let [amount_, date, description, synced, type_] = vals
-  const amount = parseFloat(amount_.replace(",", "."))
-  let type: "EXPENSE" | "INCOME" = "EXPENSE"
+  const amount = parseFloat(amount_.replace(',', '.'))
+  let type: 'EXPENSE' | 'INCOME' = 'EXPENSE'
 
-  if (type_ === undefined || type_.toUpperCase() == "INCOME" || amount < 0) {
-    type = "INCOME"
+  if (type_ === undefined || type_.toUpperCase() == 'INCOME' || amount < 0) {
+    type = 'INCOME'
   }
-  // TODO: GET ID 
+  // TODO: GET ID
   return {
-    amount
-    , date
-    , description
-    , synced: synced == "TRUE"
-    , type
+    amount,
+    date,
+    description,
+    synced: synced == 'TRUE',
+    type,
   }
 }
-
 
 export function fundToRequest(fund: Fund) {
   return [
     fund.name,
     String(fund.budget),
     `=B4-SUM(INDIRECT("$A4")&"!$A$2:$A")`,
-    '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))'
+    '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))',
   ]
 }
-
 
 export function fundToRequestObject(fund: Fund): RowData {
   return {
@@ -271,35 +271,37 @@ export function fundToRequestObject(fund: Fund): RowData {
       { userEnteredValue: { stringValue: fund.name } },
       { userEnteredValue: { numberValue: fund.budget } },
       { userEnteredValue: { formulaValue: `=B4-SUM(INDIRECT("$A4")&"!$A$2:$A")` } },
-      { userEnteredValue: { formulaValue: '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))' } }
-    ]
+      { userEnteredValue: { formulaValue: '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))' } },
+    ],
   }
 }
 
-
 export function transactionToRequest(transaction: Transaction) {
-  return [String(transaction.amount), transaction.date, transaction.description, transaction.synced ? "TRUE" : "FALSE", transaction.type]
+  return [
+    String(transaction.amount),
+    transaction.date,
+    transaction.description,
+    transaction.synced ? 'TRUE' : 'FALSE',
+    transaction.type,
+  ]
 }
-
 
 export function transactionToRequestObject(transaction: Transaction): RowData {
   return {
-
     values: [
       { userEnteredValue: { numberValue: transaction.amount } },
       { userEnteredValue: { stringValue: transaction.date } },
       { userEnteredValue: { stringValue: transaction.description } },
       { userEnteredValue: { boolValue: transaction.synced } },
-    ]
+    ],
   }
 }
 
-const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
-const CLIENT_ID = "651542402284-hfl9taqbdq2lri9nuuig3lcircq4qh0d.apps.googleusercontent.com"
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
+const CLIENT_ID = '651542402284-hfl9taqbdq2lri9nuuig3lcircq4qh0d.apps.googleusercontent.com'
 // const API_KEY = 'AlIzaSyD2vT4nkavC_nE8YFWcPUGTCmtAzC9s2c4'
 // const CLIENT_SECRET = "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"
 // const REDIRECT_URL = 'http://localhost:3000'
-
 
 export interface Token {
   token: string
@@ -320,17 +322,17 @@ export async function auth(): Promise<Token> {
       // @ts-ignore
       callback: (resp) => {
         if (resp.error !== undefined) {
-          console.log("callback error in authApi:", resp)
-          reject({ error: resp });
+          console.log('callback error in authApi:', resp)
+          reject({ error: resp })
           return
         }
         //savePersistent("expires")(String(Date.now() + parseInt(resp.expires_in) * 1000))
         // savePersistent("expires")(parseInt(resp.expires_in))
         // savePersistent("token")(resp.access_token)
         resolve({ token: resp.access_token, expires_in: parseInt(resp.expires_in) })
-      }
+      },
     })
-    client.requestAccessToken({ prompt: "consent" })
+    client.requestAccessToken({ prompt: 'consent' })
   })
 }
 

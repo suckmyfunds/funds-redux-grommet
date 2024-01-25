@@ -1,4 +1,4 @@
-import { Button } from 'grommet';
+import { Button } from 'grommet'
 export default Button
 // const Button = styled.button`
 //   padding: 5px;

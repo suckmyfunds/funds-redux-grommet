@@ -1,14 +1,15 @@
-import { Grommet, dark, grommet } from 'grommet'
+import { Grommet, grommet } from 'grommet'
 import ReactDOM from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import { persistStore } from 'reduxjs-toolkit-persist'
 import { PersistGate } from 'reduxjs-toolkit-persist/integration/react'
+
 import App from './App'
 import { store } from './store'
 import { colors } from './theme'
 
-const persistor = persistStore(store);
+const persistor = persistStore(store)
 
 const theme = {
   ...grommet,
@@ -19,7 +20,7 @@ const theme = {
       brand: colors.orange,
       //dark: colors.barkBlue,
       border: colors.blue,
-      control: colors.orange
+      control: colors.orange,
     },
     font: {
       ...grommet.global?.font,
@@ -37,5 +38,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       </BrowserRouter>
     </PersistGate>
   </Provider>
-  ,
 )
