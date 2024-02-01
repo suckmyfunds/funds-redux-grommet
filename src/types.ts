@@ -166,3 +166,20 @@ export interface SpreadSheet {
   //dataSources: DataSource[]
   //dataSourceSchedules: DataSourceRefreshSchedule[]
 }
+
+/**
+ * Represents a huge expence that user want to make in the future.
+ * It is used to control user expenses by displaying the deviation
+ * of the planned date based on the expenses that have occurred.
+ *
+ */
+export interface Target {
+  name: string
+  price: number
+  fundId: string
+  dueDate: Date
+  // or shift days? does we need to show it? How it would be calculated?
+  shiftedDate: Date
+}
+
+export type TargetRemote = Target & Entity

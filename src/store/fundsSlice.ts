@@ -182,13 +182,17 @@ export const selectLocalFunds = createSelector([selectAllFunds], (funds) =>
 
 export const selectFund = createSelector(
   [adapter.getSelectors((s: RootState) => s.funds).selectById, selectFundTransactions],
-  (fund, transactions) => ({
-    ...fund,
-    // transaction amount for expenses is negative, so we need to add it to balance
-    balance: fund.initialBalance + transactions.reduce((a, b) => a - b.amount, 0),
-    synced: transactions.every((t) => t.synced),
-    transactions,
-  })
+  (fund, transactions) => {
+    const amount = transactions.reduce((a, b) => a + b.amount, 0)
+    console.log('selectFund', fund.name, fund.initialBalance, amount)
+    return {
+      ...fund,
+      // transaction amount for expenses is negative, so we need to add it to balance
+      balance: fund.initialBalance - transactions.reduce((a, b) => a + b.amount, 0),
+      synced: transactions.every((t) => t.synced),
+      transactions,
+    }
+  }
 )
 
 export const selectFundByName = (fundName: string) => (state: RootState) =>
