@@ -52,7 +52,9 @@ export const addTransactionToFund = createAsyncThunk(
 export const makeMonthIncome = createAction('transactions/makeMonthIncome', (date?: string, amount?: number) => ({
   payload: { date, amount },
 }))
+
 export const makeSync = createAction('transactions/sync', (id: string) => ({ payload: { id } }))
+
 const adapter = createEntityAdapter({
   selectId: (t: TransactionRemote) => t.id,
 })

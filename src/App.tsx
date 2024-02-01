@@ -7,7 +7,6 @@ import FundDetailPage from './pages/FundDetailPage'
 import { FundsPage } from './pages/FundsPage'
 import StatsPage from './pages/Stats'
 import SyncPage from './pages/SyncPage'
-import { clearLocals } from './store/globalActions'
 import { syncData } from './store/syncData'
 import { makeMonthIncome } from './store/transactionsSlice'
 
@@ -37,11 +36,11 @@ export default function App() {
         <Nav pad={'10px'}>
           <Button onClick={() => navigate('/')} label="Home" disabled={location == '/'} />
           <ActionButton actionCreator={syncData} label="Update" />
-          <ActionButton actionCreator={makeMonthIncome} label="New Month" disabled={!isFirstMonthDay} />
-          <ActionButton actionCreator={clearLocals} label="Fix" />
           <Button onClick={() => navigate('/sync')} label="Sync" disabled={location == '/sync'} />
           <Button onClick={() => navigate('/stats')} label="Stats" disabled={location == '/stats'} />
           <Button onClick={() => navigate(-1)} label="back" disabled={location == '/'} />
+          {/* <ActionButton actionCreator={clearLocals} label="Fix" color='status-critical'/> */}
+          <ActionButton actionCreator={makeMonthIncome} label="New Month" disabled={!isFirstMonthDay} />
         </Nav>
       </Sidebar>
       <Box pad="small" fill>

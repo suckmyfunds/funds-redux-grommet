@@ -184,7 +184,6 @@ export const selectFund = createSelector(
   [adapter.getSelectors((s: RootState) => s.funds).selectById, selectFundTransactions],
   (fund, transactions) => {
     const amount = transactions.reduce((a, b) => a + b.amount, 0)
-    console.log('selectFund', fund.name, fund.initialBalance, amount)
     return {
       ...fund,
       // transaction amount for expenses is negative, so we need to add it to balance

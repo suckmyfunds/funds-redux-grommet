@@ -12,7 +12,6 @@ import TransactionEditor from './TransactionEditor'
 
 export default function Fund({ fundId, onClick }: { fundId: string; onClick?: () => void }) {
   const { name, budget, balance, synced, initialBalance } = useSelector((s) => selectFund(s, fundId))
-  console.log('show fund', name, budget, balance)
   const handleOnClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()

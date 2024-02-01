@@ -92,7 +92,6 @@ const FillTransactions = () => {
   const dispatch = useAppDispatch()
 
   const currentTransactions = useSelector((s) => selectTransactionsOnDate(s, date, currentFund))
-  //console.log(currentTransactions, dateToExcelFormat(date), currentFund)
   const createTransaction = useCallback(
     ({ description, amount }: { description: string; amount: string }) => {
       dispatch(

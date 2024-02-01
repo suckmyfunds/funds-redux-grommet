@@ -104,9 +104,8 @@ export async function syncTransactions(
     )
   }
   if (requests.length > 0) {
-    const response = await api.batchUpdate(requests)
-    const fundTransactionsPages = response.replies
-    console.log(fundTransactionsPages)
+    // TODO: process response?
+    await api.batchUpdate(requests)
   }
 
   // TODO: more effective sync. Maybe try to merge remoteTransactions with fundTransactionsPages

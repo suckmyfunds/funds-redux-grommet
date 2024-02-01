@@ -12,6 +12,7 @@ import {
 } from 'reduxjs-toolkit-persist'
 import storage from 'reduxjs-toolkit-persist/lib/storage'
 
+import { dateToExcelFormat } from '../utils'
 import { authSlice } from './authSlice'
 import { fundsSlice } from './fundsSlice'
 import { syncReducer } from './syncData'
@@ -73,7 +74,7 @@ const newIncomeReducer = createReducer(initialState, (builder) => {
         transactionsState.entities[trId] = {
           fundId,
           amount: -(a.payload.amount || fund.budget),
-          date: a.payload.date || new Date().toISOString(),
+          date: a.payload.date || dateToExcelFormat(new Date()),
           description: 'income',
           synced: false,
           id: trId,
