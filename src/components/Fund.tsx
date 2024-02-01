@@ -65,9 +65,11 @@ export default function Fund({ fundId, onClick }: { fundId: string; onClick?: ()
           </Box>
         </Box>
         <Box gridArea="balance" gap="small">
-          <BudgetBar budget={budget} balance={balance} warnPercent={15} />
+          <Box direction="column" fill align="center">
+            <Text>{balance.toFixed(2)}</Text>
+            <BudgetBar budget={budget} balance={balance} warnPercent={15} />
+          </Box>
         </Box>
-
         <Box gridArea="transactions">
           <TransactionEditor onSubmit={createTransaction} />
         </Box>
