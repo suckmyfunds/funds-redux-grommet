@@ -11,8 +11,18 @@ export default ({ data }: { data: TransactionRemote[] }) => {
     <DataTable
       columns={[
         { property: 'key', render: () => null },
-        { property: 'date', header: <Text>Date</Text>, render: ({ date }) => <Text>{date ? dateToExcelFormat(date) : null}</Text> },
-        { property: 'amount', header: <Text>Amount</Text>, aggregate: 'sum', footer: { aggregate: true }, render: ({ amount }) => <Text>{amount.toFixed(2)}</Text> },
+        {
+          property: 'date',
+          header: <Text>Date</Text>,
+          render: ({ date }) => <Text>{date ? dateToExcelFormat(date) : null}</Text>,
+        },
+        {
+          property: 'amount',
+          header: <Text>Amount</Text>,
+          aggregate: 'sum',
+          footer: { aggregate: true },
+          render: ({ amount }) => <Text>{amount.toFixed(2)}</Text>,
+        },
         { property: 'description', header: <Text>Description</Text> },
         {
           property: 'synced',
@@ -20,14 +30,13 @@ export default ({ data }: { data: TransactionRemote[] }) => {
           render: (payload) => <Text>{payload.synced ? 'Yes' : 'No'}</Text>,
         },
         { property: 'month', render: () => null },
-
       ]}
-      groupBy='month'
+      groupBy="month"
       data={data.map((t) => ({
         ...t,
         key: t.id,
         date: parseExcelDate(t.date),
-        month: `${parseExcelDate(t.date).getMonth()}.${parseExcelDate(t.date).getFullYear()}`
+        month: `${parseExcelDate(t.date).getMonth()}.${parseExcelDate(t.date).getFullYear()}`,
       }))}
       sortable
       onClickRow={({ datum }) => {
