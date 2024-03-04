@@ -2,7 +2,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 
 import API, { fundToRequestObject, transformFundFromResponse } from '../api'
 import type { BatchRequest, Fund, FundRemote } from '../types'
-import { loadPersistent } from '../utils'
+import { groupBy, loadPersistent, median, parseExcelDate } from '../utils'
 import { authorize, selectIsAuthorized, selectToken } from './authSlice'
 import { clearLocals } from './globalActions'
 import { RootState } from './index'
@@ -183,13 +183,28 @@ export const selectLocalFunds = createSelector([selectAllFunds], (funds) =>
 export const selectFund = createSelector(
   [adapter.getSelectors((s: RootState) => s.funds).selectById, selectFundTransactions],
   (fund, transactions) => {
-    const amount = transactions.reduce((a, b) => a + b.amount, 0)
+    const monthTransactions = groupBy(transactions, (t) => {
+      const d = parseExcelDate(t.date)
+      return `${d.getMonth()}.${d.getFullYear()}`
+    })
+
+    const expenseStat = Object.keys(monthTransactions).map((key) => {
+      let monthAmounts = monthTransactions[key].map((t) => t.amount).filter((t) => t > 0)
+      if (monthAmounts.length == 0) monthAmounts = [0]
+      const sum = monthAmounts.reduce((a, i) => a + i, 0)
+      return { date: key, median: median(monthAmounts), avg: sum / monthAmounts.length, sum }
+    })
+    const averageExpense =
+      expenseStat.reduce((acc, exp) => (exp.median <= 0 ? acc : acc + exp.median), 0) / expenseStat.length
+    console.log(fund.name, expenseStat)
     return {
       ...fund,
       // transaction amount for expenses is negative, so we need to add it to balance
       balance: fund.initialBalance - transactions.reduce((a, b) => a + b.amount, 0),
       synced: transactions.every((t) => t.synced),
       transactions,
+      expenseMedians: expenseStat,
+      averageExpense,
     }
   }
 )
