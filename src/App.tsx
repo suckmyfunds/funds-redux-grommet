@@ -7,6 +7,7 @@ import FundDetailPage from './pages/FundDetailPage'
 import { FundsPage } from './pages/FundsPage'
 import StatsPage from './pages/Stats'
 import SyncPage from './pages/SyncPage'
+import { clearLocals } from './store/globalActions'
 import { syncData } from './store/syncData'
 import { makeMonthIncome } from './store/transactionsSlice'
 
@@ -28,7 +29,7 @@ export default function App() {
   const location = useLocation().pathname
 
   //const synchronization = useSelector(isSynchronizing)
-  const isFirstMonthDay = new Date().getDate() === 1
+  //const isFirstMonthDay = new Date().getDate() === 1
 
   return (
     <Box direction="row" height={{ min: '100%' }}>
@@ -39,8 +40,8 @@ export default function App() {
           <Button onClick={() => navigate('/sync')} label="Sync" disabled={location == '/sync'} />
           <Button onClick={() => navigate('/stats')} label="Stats" disabled={location == '/stats'} />
           <Button onClick={() => navigate(-1)} label="back" disabled={location == '/'} />
-          {/* <ActionButton actionCreator={clearLocals} label="Fix" color='status-critical'/> */}
-          <ActionButton actionCreator={makeMonthIncome} label="New Month" disabled={!isFirstMonthDay} />
+          <ActionButton actionCreator={clearLocals} label="Fix" color="status-critical" />
+          <ActionButton actionCreator={makeMonthIncome} label="New Month" />
         </Nav>
       </Sidebar>
       <Box pad="small" fill>

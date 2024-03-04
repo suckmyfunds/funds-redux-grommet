@@ -1,4 +1,4 @@
-import { createAsyncThunk, createReducer, ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
+import { createAsyncThunk, createReducer, ThunkDispatch } from '@reduxjs/toolkit'
 
 import API, { transactionToRequestObject, transformTransactionFromResponse } from '../api'
 import { BatchRequest, TransactionRemote } from '../types'
@@ -8,6 +8,7 @@ import { authorize, selectIsAuthorized } from './authSlice'
 import { fundsSlice, selectAllFunds, syncFunds } from './fundsSlice'
 import { selectLocalTransactions, transactionsSlice } from './transactionsSlice'
 
+type ThunkApi = { dispatch: ThunkDispatch<RootState, unknown, any>; getState: () => RootState }
 /**
  * Steps:
  * 1. Authorize
@@ -22,21 +23,17 @@ import { selectLocalTransactions, transactionsSlice } from './transactionsSlice'
 export const syncData = createAsyncThunk('root/sync', async (_, { dispatch, getState }): Promise<void> => {
   dispatch(fundsSlice.actions.setStatus('synchronization'))
 
-  let rootState: RootState = getState() as RootState
-
-  const api = await getAuthorizedApi(rootState, dispatch)
+  const api = await getAuthorizedApi({ dispatch, getState })
 
   await dispatch(syncFunds()).unwrap()
   // name, index should match with remote
-  await syncTransactions(rootState, api, dispatch)
+  await syncTransactions(api, { dispatch, getState })
 
   dispatch(fundsSlice.actions.setStatus('idle'))
 })
 
-const getAuthorizedApi = async (
-  rootState: RootState,
-  dispatch: ThunkDispatch<unknown, unknown, UnknownAction>
-): Promise<API> => {
+const getAuthorizedApi = async ({ dispatch, getState }: ThunkApi): Promise<API> => {
+  let rootState: RootState = getState() as RootState
   let token = rootState.auth.token
   if (!selectIsAuthorized(rootState)) {
     token = (await dispatch(authorize()).unwrap()).token
@@ -44,13 +41,9 @@ const getAuthorizedApi = async (
   return new API(token)
 }
 
-export async function syncTransactions(
-  rootState: RootState,
-  api: API,
-  dispatch: ThunkDispatch<unknown, unknown, UnknownAction>
-) {
+export async function syncTransactions(api: API, rtkApi: ThunkApi) {
   let requests: BatchRequest[] = []
-
+  let rootState: RootState = rtkApi.getState() as RootState
   const funds = selectAllFunds(rootState)
 
   let remoteTransactions = (await api.batchGet(funds.map((f) => `${f.name}!A2:E`))).valueRanges.flatMap(
@@ -122,7 +115,7 @@ export async function syncTransactions(
       })
     }
   )
-  dispatch(transactionsSlice.actions.replace(remoteTransactions))
+  rtkApi.dispatch(transactionsSlice.actions.replace(remoteTransactions))
 }
 
 let initialState = { [fundsSlice.reducerPath]: { status: 'idle' } }

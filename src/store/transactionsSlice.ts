@@ -92,7 +92,7 @@ export const { selectAll: selectAllTransactions } = selectors
 
 export const selectFundTransactions = createSelector(
   [selectAllTransactions, (_, fundId: string) => fundId],
-  (transactions, fundId) => transactions.filter((t) => t.fundId === fundId)
+  (transactions, fundId) => transactions.filter((t) => t.fundId === fundId).reverse()
 )
 
 export const selectUnsyncedFundTransactions = createSelector(
