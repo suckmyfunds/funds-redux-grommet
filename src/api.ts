@@ -33,6 +33,12 @@ const SHEET_ID = '16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ'
 export interface API {
   setToken(token: string): void
   getRows(range: string): Promise<string[][]>
+  /**
+   *
+   * @param sheetName name of the sheet. Can be an RC like `SheetName!A2:A`
+   * @param rowValues column values
+   * @returns row number of appenden row
+   */
   appendRow(sheetName: string, rowValues: any[]): Promise<number>
   appendRows(sheetName: string, rowValues: any[][]): Promise<number>
   updateRow(sheetName: string, rowValues: any[], rowIndex: number): Promise<number>

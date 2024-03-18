@@ -23,8 +23,9 @@ export default function TransactionEditor({
   )
 
   function onChangeAmount(e: React.ChangeEvent<HTMLInputElement>) {
-    if (floatRegExp.test(e.target.value)) {
-      setAmount(e.target.value.startsWith('0') ? e.target.value.slice(1) : e.target.value)
+    const { value } = e.target
+    if (floatRegExp.test(value)) {
+      setAmount(value.startsWith('0') ? value.slice(1) : value)
     }
   }
 

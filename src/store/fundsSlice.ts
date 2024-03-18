@@ -167,7 +167,7 @@ export const isSynchronizing = (state: RootState) => state.funds.status === 'syn
 
 const selectors = adapter.getSelectors((s: RootState) => s.funds)
 
-export const { selectAll: selectAllFunds, selectIds: selectFundsIds } = selectors
+export const { selectAll: selectAllFunds, selectIds: selectFundsIds, selectById: selectFundById } = selectors
 
 export const selectFundNamesById = createSelector(selectAllFunds, (fs) =>
   fs.reduce((acc: Record<string, string>, f) => {

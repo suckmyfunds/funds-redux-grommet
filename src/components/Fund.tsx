@@ -1,11 +1,10 @@
-import { nanoid } from '@reduxjs/toolkit'
 import { Box, Card, DataChart, Grid, Stack, Text } from 'grommet'
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useAppDispatch } from '../store'
 import { selectFund } from '../store/fundsSlice'
-import { transactionsSlice } from '../store/transactionsSlice'
+import { addTransactionToFund } from '../store/transactionsSlice'
 import { dateToExcelFormat } from '../utils'
 import BudgetBar from './BudgetBar'
 import TransactionEditor from './TransactionEditor'
@@ -25,12 +24,11 @@ export default function Fund({ fundId, onClick }: { fundId: string; onClick?: ()
   const createTransaction = useCallback(
     ({ description, amount }: { description: string; amount: string }) => {
       dispatch(
-        transactionsSlice.actions.add({
+        addTransactionToFund({
           description,
           amount: parseFloat(amount),
           date: dateToExcelFormat(new Date()),
           synced: false,
-          id: nanoid(),
           fundId,
           type: 'EXPENSE',
         })

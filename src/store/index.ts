@@ -15,7 +15,6 @@ import storage from 'reduxjs-toolkit-persist/lib/storage'
 import { dateToExcelFormat } from '../utils'
 import { authSlice } from './authSlice'
 import { fundsSlice } from './fundsSlice'
-import { syncReducer } from './syncData'
 import { makeMonthIncome, transactionsSlice } from './transactionsSlice'
 
 const expireConfig = {
@@ -85,7 +84,7 @@ const newIncomeReducer = createReducer(initialState, (builder) => {
   })
 })
 
-const reducers = [persistReducer_, newIncomeReducer, syncReducer]
+const reducers = [persistReducer_, newIncomeReducer]
 export const store = configureStore({
   reducer: (state, a) => reducers.reduce((s, r) => r(s, a), state),
 

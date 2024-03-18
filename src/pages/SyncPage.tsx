@@ -1,4 +1,3 @@
-import { nanoid } from '@reduxjs/toolkit'
 import { Box, Calendar, DataTable, Grid, RadioButtonGroup, Stack, Text } from 'grommet'
 import { useCallback, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -102,7 +101,6 @@ const FillTransactions = () => {
           date: dateToExcelFormat(date),
           synced: false,
           type: 'EXPENSE',
-          id: nanoid(),
         })
       )
     },
