@@ -31,7 +31,7 @@ const theme = {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <BrowserRouter>
+      <BrowserRouter basename="/pages">
         <Grommet theme={theme}>
           <App />
         </Grommet>
