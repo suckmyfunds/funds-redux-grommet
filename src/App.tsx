@@ -58,13 +58,7 @@ export default function App() {
   console.log('SIZE', size)
   const navigate = useNavigate()
   const location = useLocation().pathname
-  if (!authorized) {
-    return (
-      <Box dir="column">
-        <Button onClick={init} label="Authorize" />
-      </Box>
-    )
-  }
+
   useEffect(() => {
     if (authorized) {
       dispatch(fetchFunds())
@@ -74,6 +68,15 @@ export default function App() {
         })
     }
   }, [authorized])
+
+  if (!authorized) {
+    return (
+      <Box dir="column">
+        <Button onClick={init} label="Authorize" />
+      </Box>
+    )
+  }
+
   return (
     <Box direction="column">
       <Box direction="row" fill flex justify="between">
