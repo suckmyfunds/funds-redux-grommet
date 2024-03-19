@@ -1,5 +1,5 @@
 import { Box, Collapsible, ResponsiveContext, Sidebar } from 'grommet'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
@@ -49,21 +49,31 @@ export default function App() {
   const dispatch = useAppDispatch()
   const size = useContext(ResponsiveContext)
   const [menuShown, setMenuShown] = useState(false)
-  useEffect(() => {
-    if (!authorized) {
-      dispatch(authorize())
-    } else {
-      dispatch(fetchFunds())
-        .unwrap()
-        .then(() => dispatch(fetchTransactions()))
-    }
-  }, [authorized, dispatch])
+  const init = useCallback(async () => {
+    await dispatch(authorize()).unwrap()
+  }, [authorize, fetchFunds, fetchTransactions])
+
   //const synchronization = useSelector(isSynchronizing)
   //const isFirstMonthDay = new Date().getDate() === 1
   console.log('SIZE', size)
   const navigate = useNavigate()
   const location = useLocation().pathname
-
+  if (!authorized) {
+    return (
+      <Box dir="column">
+        <Button onClick={init} label="Authorize" />
+      </Box>
+    )
+  }
+  useEffect(() => {
+    if (authorized) {
+      dispatch(fetchFunds())
+        .unwrap()
+        .then(() => {
+          dispatch(fetchTransactions())
+        })
+    }
+  }, [authorized])
   return (
     <Box direction="column">
       <Box direction="row" fill flex justify="between">

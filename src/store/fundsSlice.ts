@@ -145,10 +145,11 @@ const slice = createSlice({
         s.status = 'loading'
       }
     })
-    builder.addCase(fetchFunds.fulfilled, (s, _) => {
+    builder.addCase(fetchFunds.fulfilled, (s, { payload }) => {
       if (s.status !== 'synchronization') {
         s.status = 'idle'
       }
+      adapter.setAll(s, payload)
     })
     builder.addCase(clearLocals, (s, _) => {
       adapter.removeMany(
