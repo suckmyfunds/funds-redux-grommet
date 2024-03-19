@@ -1,5 +1,5 @@
-import { Box, Calendar, DataTable, Grid, RadioButtonGroup, Stack, Text } from 'grommet'
-import { useCallback, useState } from 'react'
+import { Box, Calendar, DataTable, DateInput, Grid, RadioButtonGroup, ResponsiveContext, Stack, Text } from 'grommet'
+import { useCallback, useContext, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import Button from '../components/Button'
@@ -64,15 +64,21 @@ const CalendarDayBox = ({
   fundId?: string
 }) => {
   const trCount = useSelector((s) => selectTransactionsOnDate(s, date, fundId).length)
-
+  const size = useContext(ResponsiveContext)
   return (
-    <Box background={isSelected ? 'light-3' : 'white'} onClick={() => onSelectDate(date.toISOString())} fill>
+    <Box
+      background={isSelected ? 'light-3' : 'white'}
+      onClick={() => onSelectDate(date.toISOString())}
+      fill
+      gap={size == 'small' ? 'xxsmall' : 'medium'}
+      pad={size == 'small' ? 'xxsmall' : 'medium'}
+    >
       <Stack anchor="top-right" fill>
-        <Box pad="small" align="center" justify="center" fill>
-          <Text size="large">{day}</Text>
+        <Box align="center" justify="center" fill gap={size} pad={size}>
+          <Text size={size}>{day}</Text>
         </Box>
         {trCount ? (
-          <Box align="right" justify="start" color="accent-1">
+          <Box align="right" justify="start" color="accent-1" gap={size}>
             <Text color="brandc" size="xsmall">
               {trCount}
             </Text>
@@ -110,45 +116,96 @@ const FillTransactions = () => {
     setDate(new Date(nextDate))
   }
 
+  const size = useContext(ResponsiveContext)
+
   return (
-    <Grid gap="medium" columns={['medium', 'auto']} fill>
-      <Box direction="column" gap="xsmall">
-        <Button
-          secondary
-          onClick={() => {
-            setDate(new Date())
-          }}
-          label="Today"
-        />
-        <Calendar date={date.toISOString()} onSelect={onSelectDate}>
-          {(props) => (
+    <Grid gap="medium" columns={size != 'small' ? ['medium', 'auto'] : ['auto']} fill>
+      {size !== 'small' && (
+        <>
+          <Box direction="column" gap={size}>
+            <Button
+              secondary
+              onClick={() => {
+                setDate(new Date())
+              }}
+              label="Today"
+            />
+
+            <Calendar date={date.toISOString()} onSelect={onSelectDate}>
+              {(props: any) => (
+                <CalendarDayBox
+                  key={dateToExcelFormat(props.date)}
+                  {...props}
+                  fundId={currentFund}
+                  onSelectDate={onSelectDate}
+                />
+              )}
+            </Calendar>
+          </Box>
+          <Box direction="column" gap="xsmall">
+            <Grid gap="small" columns={['1fr', '1fr', '1fr', '1fr']}>
+              <Button
+                secondary
+                primary={currentFund === undefined}
+                onClick={() => setCurrentFund(undefined)}
+                label="All"
+              />
+              {funds.map((f) => {
+                return (
+                  <Button
+                    key={f.id}
+                    secondary
+                    primary={currentFund === f.id}
+                    onClick={() => setCurrentFund(f.id)}
+                    label={f.name}
+                  />
+                )
+              })}
+            </Grid>
+            <TransactionEditor onSubmit={createTransaction} disabled={currentFund === undefined} />
+            <TransactionsTable data={currentTransactions} withoutDate />
+          </Box>
+        </>
+      )}
+      <DateInput
+        format="dd.mm.yyyy"
+        value={date.toISOString()}
+        calendarProps={{
+          size,
+          //@ts-ignore
+          children: (props) => (
             <CalendarDayBox
               key={dateToExcelFormat(props.date)}
               {...props}
               fundId={currentFund}
               onSelectDate={onSelectDate}
             />
-          )}
-        </Calendar>
-      </Box>
-      <Box direction="column" gap="xsmall">
-        <Grid gap="small" columns={['1fr', '1fr', '1fr', '1fr']}>
-          <Button secondary primary={currentFund === undefined} onClick={() => setCurrentFund(undefined)} label="All" />
-          {funds.map((f) => {
-            return (
-              <Button
-                key={f.id}
-                secondary
-                primary={currentFund === f.id}
-                onClick={() => setCurrentFund(f.id)}
-                label={f.name}
-              />
-            )
-          })}
-        </Grid>
-        <TransactionEditor onSubmit={createTransaction} disabled={currentFund === undefined} />
-        <TransactionsTable data={currentTransactions} />
-      </Box>
+          ),
+        }}
+      />
+      <Grid gap={size} columns={size != 'small' ? ['1fr', '1fr', '1fr', '1fr'] : ['auto', 'auto']} fill>
+        <Button
+          secondary
+          primary={currentFund === undefined}
+          onClick={() => setCurrentFund(undefined)}
+          label="All"
+          size={size}
+        />
+        {funds.map((f) => {
+          return (
+            <Button
+              key={f.id}
+              secondary
+              size={size}
+              primary={currentFund === f.id}
+              onClick={() => setCurrentFund(f.id)}
+              label={f.name}
+            />
+          )
+        })}
+      </Grid>
+      <TransactionEditor onSubmit={createTransaction} disabled={currentFund === undefined} />
+      <TransactionsTable data={currentTransactions} withoutDate />
     </Grid>
   )
 }

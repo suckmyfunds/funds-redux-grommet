@@ -51,6 +51,11 @@ export function groupBy<T>(array: T[], predicate: Predicate<T>): { [key: string]
   }, {})
 }
 
+/**
+ * return string formatted like DD.MM.YYYY
+ * @param date date to format
+ * @returns
+ */
 export function dateToExcelFormat(date: Date): string {
   return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`
 }

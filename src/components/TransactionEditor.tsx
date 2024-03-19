@@ -1,5 +1,5 @@
-import { Box, Button, TextInput } from 'grommet'
-import { useCallback, useState } from 'react'
+import { Box, Button, ResponsiveContext, TextInput } from 'grommet'
+import { useCallback, useContext, useState } from 'react'
 
 const floatRegExp = new RegExp('^-?[0-9]*([0-9]{1}[.,][0-9]{0,2})?$')
 
@@ -12,7 +12,7 @@ export default function TransactionEditor({
 }) {
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
-
+  const size = useContext(ResponsiveContext)
   const onClick = useCallback(
     (e: React.UIEvent) => {
       e.preventDefault()
@@ -31,11 +31,12 @@ export default function TransactionEditor({
 
   return (
     <Box gap="small">
-      <Box flex direction="row" gap="small">
+      <Box flex direction="row" gap={size}>
         <TextInput
           type="text"
           placeholder="amount"
           name="amount"
+          size={size}
           value={amount}
           onChange={onChangeAmount}
           autoFocus={true}
@@ -45,12 +46,13 @@ export default function TransactionEditor({
           type="text"
           placeholder="description"
           name="desctiprion"
+          size={size}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
       </Box>
       <Box>
-        <Button onClick={onClick} label="Add" disabled={disabled || amount === ''} />
+        <Button onClick={onClick} size={size} label="Add" disabled={disabled || amount === ''} />
       </Box>
     </Box>
   )

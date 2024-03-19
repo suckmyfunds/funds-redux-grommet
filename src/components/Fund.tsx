@@ -1,5 +1,5 @@
-import { Box, Card, DataChart, Grid, Stack, Text } from 'grommet'
-import React, { useCallback } from 'react'
+import { Box, Card, DataChart, Grid, ResponsiveContext, Stack, Text } from 'grommet'
+import React, { useCallback, useContext } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useAppDispatch } from '../store'
@@ -11,6 +11,7 @@ import TransactionEditor from './TransactionEditor'
 
 export default function Fund({ fundId, onClick }: { fundId: string; onClick?: () => void }) {
   const { name, budget, balance, synced, initialBalance, expenseMedians } = useSelector((s) => selectFund(s, fundId))
+  const size = useContext(ResponsiveContext)
   const handleOnClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
@@ -63,19 +64,21 @@ export default function Fund({ fundId, onClick }: { fundId: string; onClick?: ()
         </Box>
         <Box gridArea="balance" gap="small">
           <Box direction="column" fill align="center">
-            <Box fill align="center" pad="small">
-              <DataChart
-                data={expenseMedians}
-                series={[
-                  { property: 'date', label: 'Month' },
-                  { property: 'sum', label: 'Expense', render: (v) => v.toFixed(2) },
-                ]}
-                chart="sum"
-                detail
-                guide
-                axis
-              />
-            </Box>
+            {size !== 'small' && (
+              <Box fill align="center" pad="small">
+                <DataChart
+                  data={expenseMedians}
+                  series={[
+                    { property: 'date', label: 'Month' },
+                    { property: 'sum', label: 'Expense', render: (v) => v.toFixed(2) },
+                  ]}
+                  chart="sum"
+                  detail
+                  guide
+                  axis
+                />
+              </Box>
+            )}
             <Text>{balance.toFixed(2)}</Text>
             <BudgetBar budget={budget} balance={balance} warnPercent={15} />
           </Box>
