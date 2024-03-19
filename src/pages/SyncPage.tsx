@@ -65,21 +65,24 @@ const CalendarDayBox = ({
 }) => {
   const trCount = useSelector((s) => selectTransactionsOnDate(s, date, fundId).length)
   const size = useContext(ResponsiveContext)
+  const gap = size == 'small' ? 'xxsmall' : 'small'
+  const pad = size == 'small' ? 'xxsmall' : 'small'
+  const textSize = size == 'small' ? 'small' : 'medium'
   return (
     <Box
       background={isSelected ? 'light-3' : 'white'}
       onClick={() => onSelectDate(date.toISOString())}
       fill
-      gap={size == 'small' ? 'xxsmall' : 'medium'}
-      pad={size == 'small' ? 'xxsmall' : 'medium'}
+      gap={gap}
+      pad={pad}
     >
       <Stack anchor="top-right" fill>
-        <Box align="center" justify="center" fill gap={size} pad={size}>
-          <Text size={size}>{day}</Text>
+        <Box align="center" justify="center" fill gap={'xsmall'} pad={'small'}>
+          <Text size={textSize}>{day}</Text>
         </Box>
         {trCount ? (
-          <Box align="right" justify="start" color="accent-1" gap={size}>
-            <Text color="brandc" size="xsmall">
+          <Box align="right" justify="start" color="brand" gap={'small'}>
+            <Text color="brand" size={size == 'small' ? 'xxsmall' : 'xsmall'}>
               {trCount}
             </Text>
           </Box>
@@ -120,7 +123,7 @@ const FillTransactions = () => {
 
   return (
     <Grid gap="medium" columns={size != 'small' ? ['medium', 'auto'] : ['auto']} fill>
-      {size !== 'small' && (
+      {size !== 'small' ? (
         <>
           <Box direction="column" gap={size}>
             <Button
@@ -166,46 +169,49 @@ const FillTransactions = () => {
             <TransactionsTable data={currentTransactions} withoutDate />
           </Box>
         </>
-      )}
-      <DateInput
-        format="dd.mm.yyyy"
-        value={date.toISOString()}
-        calendarProps={{
-          size,
-          //@ts-ignore
-          children: (props) => (
-            <CalendarDayBox
-              key={dateToExcelFormat(props.date)}
-              {...props}
-              fundId={currentFund}
-              onSelectDate={onSelectDate}
-            />
-          ),
-        }}
-      />
-      <Grid gap={size} columns={size != 'small' ? ['1fr', '1fr', '1fr', '1fr'] : ['auto', 'auto']} fill>
-        <Button
-          secondary
-          primary={currentFund === undefined}
-          onClick={() => setCurrentFund(undefined)}
-          label="All"
-          size={size}
-        />
-        {funds.map((f) => {
-          return (
+      ) : (
+        <>
+          <DateInput
+            format="dd.mm.yyyy"
+            value={date.toISOString()}
+            calendarProps={{
+              size,
+              //@ts-ignore
+              children: (props) => (
+                <CalendarDayBox
+                  key={dateToExcelFormat(props.date)}
+                  {...props}
+                  fundId={currentFund}
+                  onSelectDate={onSelectDate}
+                />
+              ),
+            }}
+          />
+          <Grid gap={size} columns={size != 'small' ? ['1fr', '1fr', '1fr', '1fr'] : ['auto', 'auto']} fill>
             <Button
-              key={f.id}
               secondary
+              primary={currentFund === undefined}
+              onClick={() => setCurrentFund(undefined)}
+              label="All"
               size={size}
-              primary={currentFund === f.id}
-              onClick={() => setCurrentFund(f.id)}
-              label={f.name}
             />
-          )
-        })}
-      </Grid>
-      <TransactionEditor onSubmit={createTransaction} disabled={currentFund === undefined} />
-      <TransactionsTable data={currentTransactions} withoutDate />
+            {funds.map((f) => {
+              return (
+                <Button
+                  key={f.id}
+                  secondary
+                  size={size}
+                  primary={currentFund === f.id}
+                  onClick={() => setCurrentFund(f.id)}
+                  label={f.name}
+                />
+              )
+            })}
+          </Grid>
+          <TransactionEditor onSubmit={createTransaction} disabled={currentFund === undefined} />
+          <TransactionsTable data={currentTransactions} withoutDate />
+        </>
+      )}
     </Grid>
   )
 }

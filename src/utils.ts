@@ -57,10 +57,15 @@ export function groupBy<T>(array: T[], predicate: Predicate<T>): { [key: string]
  * @returns
  */
 export function dateToExcelFormat(date: Date): string {
-  let year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(date)
-  let month = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(date)
-  let day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date)
-  return `${day}-${month}-${year}`
+  try {
+    let year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(date)
+    let month = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(date)
+    let day = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(date)
+    return `${day}.${month}.${year}`
+  } catch (e) {
+    console.log(e)
+    throw e
+  }
 }
 
 export function parseExcelDate(dateString: string): Date {

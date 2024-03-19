@@ -114,7 +114,6 @@ export const selectFund = createSelector(
     })
     const averageExpense =
       expenseStat.reduce((acc, exp) => (exp.median <= 0 ? acc : acc + exp.median), 0) / expenseStat.length
-    console.log(fund.name, expenseStat)
     return {
       ...fund,
       // transaction amount for expenses is negative, so we need to add it to balance

@@ -82,6 +82,7 @@ export default class GoogleSpreadsheetAPI implements API {
       } else {
         content = err.response ? (err.response.data ? err.response.data : err.response) : err
         console.error('Error basic fetch:', content)
+        throw error
       }
       throw content
     }

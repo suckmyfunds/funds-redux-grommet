@@ -67,7 +67,7 @@ export default function App() {
           dispatch(fetchTransactions())
         })
     }
-  }, [authorized])
+  }, [authorized, fetchFunds, fetchTransactions])
 
   if (!authorized) {
     return (

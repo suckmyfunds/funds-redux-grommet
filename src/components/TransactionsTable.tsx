@@ -35,10 +35,10 @@ export default ({ data, withoutDate }: { data: TransactionRemote[]; withoutDate?
   return (
     <DataTable
       size="small"
+      primaryKey="id"
       columns={columns}
       data={data.map((t) => ({
         ...t,
-        key: t.id,
         date: parseExcelDate(t.date),
         month: `${parseExcelDate(t.date).getMonth()}.${parseExcelDate(t.date).getFullYear()}`,
       }))}
