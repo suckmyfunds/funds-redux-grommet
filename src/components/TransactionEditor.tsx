@@ -30,7 +30,7 @@ export default function TransactionEditor({
   }
 
   return (
-    <Box gap="small">
+    <Box gap="small" direction="column">
       <Box flex direction="row" gap={size}>
         <TextInput
           type="text"

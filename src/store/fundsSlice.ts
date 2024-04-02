@@ -2,7 +2,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 
 import API, { transformFundFromResponse } from '../api'
 import type { FundRemote } from '../types'
-import { groupBy, median, parseExcelDate } from '../utils'
+import { groupBy, median, dateFromExcelFormat } from '../utils'
 import { selectToken } from './authSlice'
 import { clearLocals } from './globalActions'
 import { RootState } from './index'
@@ -102,7 +102,7 @@ export const selectFund = createSelector(
   [adapter.getSelectors((s: RootState) => s.funds).selectById, selectFundTransactions],
   (fund, transactions) => {
     const monthTransactions = groupBy(transactions, (t) => {
-      const d = parseExcelDate(t.date)
+      const d = dateFromExcelFormat(t.date)
       return `${d.getMonth()}.${d.getFullYear()}`
     })
 

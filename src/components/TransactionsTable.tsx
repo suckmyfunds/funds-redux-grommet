@@ -3,7 +3,7 @@ import { DataTable, Text } from 'grommet'
 import { useAppDispatch } from '../store'
 import { transactionsSlice } from '../store/transactionsSlice'
 import { TransactionRemote } from '../types'
-import { dateToExcelFormat, parseExcelDate } from '../utils'
+import { dateFromExcelFormat, dateToExcelFormat } from '../utils'
 
 export default ({ data, withoutDate }: { data: TransactionRemote[]; withoutDate?: boolean }) => {
   const dispatch = useAppDispatch()
@@ -39,8 +39,8 @@ export default ({ data, withoutDate }: { data: TransactionRemote[]; withoutDate?
       columns={columns}
       data={data.map((t) => ({
         ...t,
-        date: parseExcelDate(t.date),
-        month: `${parseExcelDate(t.date).getMonth()}.${parseExcelDate(t.date).getFullYear()}`,
+        date: dateFromExcelFormat(t.date),
+        month: `${dateFromExcelFormat(t.date).getMonth()}.${dateFromExcelFormat(t.date).getFullYear()}`,
       }))}
       onClickRow={({ datum }) => {
         if (datum.syncDate === undefined) {

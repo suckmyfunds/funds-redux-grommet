@@ -1,7 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit'
 
 import { TransactionRemote } from '../types'
-import { compareDates, groupBy, median, parseExcelDate } from '../utils'
+import { compareDates, dateFromExcelFormat, groupBy, median } from '../utils'
 import { selectAllFunds } from './fundsSlice'
 import { selectTransactionsByFundId } from './transactionsSlice'
 
@@ -23,7 +23,7 @@ export const selectFundsChartData = createSelector(
   (transactions, funds, treshhold) =>
     funds.map((f) => {
       const trs = transactions[f.id].filter((t) => t.amount <= treshhold)
-      const groups = groupBy(trs, (t) => parseExcelDate(t.date).getMonth())
+      const groups = groupBy(trs, (t) => dateFromExcelFormat(t.date).getMonth())
       return {
         name: f.name,
         transactions: Object.keys(groups).map((month) => {
@@ -42,6 +42,6 @@ export const selectTransactionsOnDate = createSelector(
   [selectTransactionsByFundId, (_, date: Date, fundId?: string) => ({ date: date, fundId })],
   (transactions, { date, fundId }) =>
     (fundId ? transactions[fundId] : Object.values(transactions).flat()).filter(
-      (t) => compareDates(parseExcelDate(t.date), date) === 0
+      (t) => compareDates(dateFromExcelFormat(t.date), date) === 0
     )
 )

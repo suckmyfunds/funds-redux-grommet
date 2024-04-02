@@ -1,6 +1,6 @@
-import { Button } from 'grommet'
+import { Button } from '@mantine/core'
 export default Button
-export type { ButtonProps } from 'grommet'
+export type { ButtonProps } from '@mantine/core'
 // const Button = styled.button`
 //   padding: 5px;
 //   border-radius: 5px;

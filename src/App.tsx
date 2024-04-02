@@ -1,10 +1,14 @@
-import { Box, Collapsible, ResponsiveContext, Sidebar } from 'grommet'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import '@mantine/core/styles.css'
+
+import { AppShell, Burger, Container, Stack } from '@mantine/core'
+import { Button } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
+import { ResponsiveContext } from 'grommet'
+import { useCallback, useContext, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
 import ActionButton from './components/ActionButton'
-import Button from './components/Button'
 import FundDetailPage from './pages/FundDetailPage'
 import { FundsPage } from './pages/FundsPage'
 import StatsPage from './pages/Stats'
@@ -15,7 +19,6 @@ import { selectIsAuthorized } from './store/authSlice'
 import { fetchFunds } from './store/fundsSlice'
 import { clearLocals } from './store/globalActions'
 import { fetchTransactions, makeMonthIncome } from './store/transactionsSlice'
-
 // const AppBar = (props: any) => (
 //   <Box
 //     tag='header'
@@ -31,33 +34,50 @@ import { fetchTransactions, makeMonthIncome } from './store/transactionsSlice'
 function Menu({ navigate }: { navigate: (path: any) => void }) {
   const location = useLocation().pathname
   const size = useContext(ResponsiveContext)
+  const authorized = useSelector(selectIsAuthorized)
+  const dispatch = useAppDispatch()
+
+  const init = useCallback(async () => {
+    await dispatch(authorize()).unwrap()
+  }, [authorize])
+
   return (
-    <Sidebar>
-      <Box direction="column" gap={size} fill>
-        <Button size={size} onClick={() => navigate('/')} label="Home" disabled={location == '/'} />
-        <Button size={size} onClick={() => navigate('/sync')} label="Sync" disabled={location == '/sync'} />
-        <Button size={size} onClick={() => navigate('/stats')} label="Stats" disabled={location == '/stats'} />
-        <Button size={size} onClick={() => navigate(-1)} label="back" disabled={location == '/'} />
-        <ActionButton size={size} actionCreator={clearLocals} label="Fix" color="status-critical" />
-        <ActionButton size={size} actionCreator={makeMonthIncome} label="New Month" />
-      </Box>
-    </Sidebar>
+    <Container size="md">
+      <Stack>
+        {!authorized && (
+          <Button variant="filled" onClick={init}>
+            Authorize
+          </Button>
+        )}
+        <Button size={size} onClick={() => navigate('/')} disabled={location == '/'} variant="fill">
+          Home
+        </Button>
+        <Button size={size} onClick={() => navigate('/sync')} disabled={location == '/sync'}>
+          Sync
+        </Button>
+        <Button size={size} onClick={() => navigate('/stats')} disabled={location == '/stats'}>
+          Stats
+        </Button>
+        <ActionButton size={size} actionCreator={clearLocals} variant="outline" color="red">
+          Fix
+        </ActionButton>
+        <ActionButton size={size} actionCreator={makeMonthIncome}>
+          New Month
+        </ActionButton>
+      </Stack>
+    </Container>
   )
 }
 export default function App() {
   const authorized = useSelector(selectIsAuthorized)
   const dispatch = useAppDispatch()
   const size = useContext(ResponsiveContext)
-  const [menuShown, setMenuShown] = useState(false)
-  const init = useCallback(async () => {
-    await dispatch(authorize()).unwrap()
-  }, [authorize, fetchFunds, fetchTransactions])
 
   //const synchronization = useSelector(isSynchronizing)
   //const isFirstMonthDay = new Date().getDate() === 1
   console.log('SIZE', size)
   const navigate = useNavigate()
-  const location = useLocation().pathname
+  //const location = useLocation().pathname
 
   useEffect(() => {
     if (authorized) {
@@ -69,44 +89,31 @@ export default function App() {
     }
   }, [authorized, fetchFunds, fetchTransactions])
 
-  if (!authorized) {
-    return (
-      <Box dir="column">
-        <Button onClick={init} label="Authorize" />
-      </Box>
-    )
-  }
-
+  const [opened, { toggle }] = useDisclosure()
   return (
-    <Box direction="column">
-      <Box direction="row" fill flex justify="between">
-        <Button onClick={() => setMenuShown(!menuShown)} label="menu" size={size} />
-        {location !== '/' && <Button onClick={() => navigate('/')} label="back" size={size} />}
-      </Box>
-
-      {size == 'small' && (
-        <Collapsible direction="vertical" open={menuShown}>
-          <Menu
-            navigate={(path: any) => {
-              setMenuShown(false)
-              navigate(path)
-            }}
-          />
-        </Collapsible>
-      )}
-      <Box direction="row" height={{ min: '100%' }}>
-        {(size == 'medium' || size == 'large') && <Menu navigate={(p) => navigate(p)} />}
-        <Box pad="small" fill>
-          {/* <AnimatePresence> */}
-          <Routes>
-            <Route path="/" element={<FundsPage />} />
-            <Route path="/detail/:id" element={<FundDetailPage />} />
-            <Route path="/sync" element={<SyncPage />} />
-            <Route path="/stats" element={<StatsPage />} />
-          </Routes>
-          {/* </AnimatePresence> */}
-        </Box>
-      </Box>
-    </Box>
+    <AppShell
+      header={{ height: 60 }}
+      navbar={{
+        width: 300,
+        breakpoint: 'sm',
+        collapsed: { mobile: !opened },
+      }}
+      padding="md"
+    >
+      <AppShell.Header>
+        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+      </AppShell.Header>
+      <AppShell.Navbar>
+        <Menu navigate={navigate} />
+      </AppShell.Navbar>
+      <AppShell.Main>
+        <Routes>
+          <Route path="/" element={<FundsPage />} />
+          <Route path="/detail/:id" element={<FundDetailPage />} />
+          <Route path="/sync" element={<SyncPage />} />
+          <Route path="/stats" element={<StatsPage />} />
+        </Routes>
+      </AppShell.Main>
+    </AppShell>
   )
 }

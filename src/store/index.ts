@@ -15,6 +15,7 @@ import storage from 'reduxjs-toolkit-persist/lib/storage'
 import { dateToExcelFormat } from '../utils'
 import { authSlice } from './authSlice'
 import { fundsSlice } from './fundsSlice'
+import { tempSlice } from './temp'
 import { makeMonthIncome, transactionsSlice } from './transactionsSlice'
 
 const expireConfig = {
@@ -29,6 +30,7 @@ const combinedReducer = combineReducers({
   [authSlice.reducerPath]: authSlice.reducer,
   [fundsSlice.reducerPath]: fundsSlice.reducer,
   [transactionsSlice.reducerPath]: transactionsSlice.reducer,
+  [tempSlice.reducerPath]: tempSlice.reducer,
 })
 
 export const initialState = {

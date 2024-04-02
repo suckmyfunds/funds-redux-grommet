@@ -68,7 +68,7 @@ export function dateToExcelFormat(date: Date): string {
   }
 }
 
-export function parseExcelDate(dateString: string): Date {
+export function dateFromExcelFormat(dateString: string): Date {
   const [day, month, year] = dateString.split('.').map(Number)
   // Months in JavaScript's Date object are 0-indexed, so we subtract 1 from the month
   return new Date(year, month - 1, day)
