@@ -1,4 +1,4 @@
-import { em, Flex, Grid, Stack } from '@mantine/core'
+import { em, Flex, Grid, Stack, Table } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 import { Calendar as Calendar_ } from 'grommet'
 import { useCallback } from 'react'
@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux'
 
 import Button from '../../components/Button'
 import TransactionEditor from '../../components/TransactionEditor'
-import TransactionsTable from '../../components/TransactionsTable'
 import { RootState, selectAllFunds, useAppDispatch } from '../../store'
 import { selectTransactionsOnDate } from '../../store/selectors'
 import { tempSlice } from '../../store/temp'
@@ -15,21 +14,20 @@ import { dateFromExcelFormat, dateToExcelFormat } from '../../utils'
 import { CalendarDayBox } from './CalendarDayBox'
 
 export const FillTransactions = () => {
-  const currentFund = useSelector((s: RootState) => tempSlice.getSelectors().getCurrentFund(s))
-  const isMobile = useMediaQuery(`(max-width: ${em(750)})`)
+  const isMobile = useMediaQuery(`(max-width: ${em(1100)})`)
   return (
     <Grid>
       {isMobile ? (
         <>
-          <Grid.Col span={6}>
-            <Calendar currentFund={currentFund} />
+          <Grid.Col span={12}>
+            <Calendar />
             <FundsSelection />
           </Grid.Col>
         </>
       ) : (
         <>
           <Grid.Col span={6}>
-            <Calendar currentFund={currentFund} />
+            <Calendar />
           </Grid.Col>
           <Grid.Col span={6}>
             <FundsSelection />
@@ -44,9 +42,12 @@ function FundsSelection() {
 
   const date = useSelector((s: RootState) => s.temp.currentDate)
   const funds = useSelector(selectAllFunds)
-  const currentFund = useSelector((s: RootState) => tempSlice.getSelectors().getCurrentFund(s))
+  const currentFund = useSelector((s: RootState) => s.temp.currentFund)
+  console.log('currentFund', currentFund)
   const setCurrentFund = useCallback(
     (fund: string | undefined) => {
+      console.log('setCurrentFund', fund, 'prev', currentFund)
+
       dispatch(tempSlice.actions.setCurrentFund(fund))
     },
     [dispatch]
@@ -87,12 +88,30 @@ function FundsSelection() {
         })}
       </Flex>
       <TransactionEditor onSubmit={createTransaction} disabled={currentFund === undefined} />
-      <TransactionsTable data={currentTransactions} withoutDate />
+      <Table>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>Date</Table.Th>
+            <Table.Th>Amount</Table.Th>
+            <Table.Th>Description</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          {currentTransactions.map((tr) => (
+            <Table.Tr>
+              <Table.Td>{tr.date}</Table.Td>
+              <Table.Td>{tr.amount}</Table.Td>
+              <Table.Td>{tr.description}</Table.Td>
+            </Table.Tr>
+          ))}
+        </Table.Tbody>
+      </Table>
     </Stack>
   )
 }
 
-function Calendar({ currentFund }: { currentFund: string | undefined }) {
+function Calendar() {
+  const currentFund = useSelector((s: RootState) => s.temp.currentFund)
   const dispatch = useAppDispatch()
   const setDate = useCallback(
     (date: Date) => {
@@ -101,7 +120,6 @@ function Calendar({ currentFund }: { currentFund: string | undefined }) {
     [dispatch]
   )
   const date = useSelector((s: RootState) => s.temp.currentDate)
-  console.log('calendar', date)
   const onSelectDate = (nextDate: any) => {
     setDate(new Date(nextDate))
   }

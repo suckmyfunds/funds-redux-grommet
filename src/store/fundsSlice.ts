@@ -2,7 +2,7 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 
 import API, { transformFundFromResponse } from '../api'
 import type { FundRemote } from '../types'
-import { groupBy, median, dateFromExcelFormat } from '../utils'
+import { dateFromExcelFormat, groupBy, median } from '../utils'
 import { selectToken } from './authSlice'
 import { clearLocals } from './globalActions'
 import { RootState } from './index'
@@ -12,9 +12,8 @@ export const fetchFunds = createAsyncThunk('funds/fetchAll', async (_, { getStat
   const rootState = getState() as RootState
   const token = selectToken(rootState)
   let api = new API(token)
-  return (await api.getRows('funds!A2:E')).map((f, idx) => ({
+  return (await api.getRows('funds!A2:F')).map((f) => ({
     ...transformFundFromResponse(f),
-    id: `${idx + 2}`,
     status: 'idle',
     syncDate: new Date().toISOString(),
   }))

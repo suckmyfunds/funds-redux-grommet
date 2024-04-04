@@ -11,8 +11,6 @@ export default ({ data, withoutDate }: { data: TransactionRemote[]; withoutDate?
     {
       property: 'amount',
       header: 'Amount',
-      aggregate: 'sum',
-      footer: { aggregate: true },
       render: ({ amount }: { amount: number }) => <Text>{amount.toFixed(2)}</Text>,
     },
     { property: 'description', header: 'Description' },
@@ -20,6 +18,11 @@ export default ({ data, withoutDate }: { data: TransactionRemote[]; withoutDate?
       property: 'synced',
       header: 'Synced',
       render: (payload: TransactionRemote) => <Text>{payload.synced ? 'Yes' : 'No'}</Text>,
+    },
+    {
+      property: 'syncDate',
+      header: 'SyncDate',
+      render: (t: TransactionRemote) => <Text>{t.syncDate ? t.syncDate : 'none'}</Text>,
     },
   ]
   if (!withoutDate) {

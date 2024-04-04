@@ -1,4 +1,4 @@
-import { combineReducers, configureStore, createReducer, nanoid } from '@reduxjs/toolkit'
+import { combineReducers, configureStore, createReducer } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
 import {
   createTransform,
@@ -63,26 +63,11 @@ const persistReducer_ = persistReducer(
 
 // TODO: check that in this month income was done. Transaction should have a type?
 const newIncomeReducer = createReducer(initialState, (builder) => {
-  builder.addCase(makeMonthIncome, (s, a) => {
-    if (makeMonthIncome.match(a)) {
-      const fundsState = s[fundsSlice.reducerPath]
-      const transactionsState = s[transactionsSlice.reducerPath]
-
-      for (let fundId of fundsState.ids) {
-        const fund = fundsState.entities[fundId]
-        const trId = nanoid()
-        transactionsState.ids.push(trId)
-        transactionsState.entities[trId] = {
-          fundId,
-          amount: -(a.payload.amount || fund.budget),
-          date: a.payload.date || dateToExcelFormat(new Date()),
-          description: 'income',
-          synced: false,
-          id: trId,
-          type: 'INCOME',
-        }
-      }
-    }
+  builder.addCase(makeMonthIncome.fulfilled, (s, a) => {
+    a.payload.map((tId) => (s.transactions.entities[tId].syncDate = dateToExcelFormat(new Date())))
+  })
+  builder.addCase(makeMonthIncome.rejected, (_, a) => {
+    console.error(a.error)
   })
 })
 

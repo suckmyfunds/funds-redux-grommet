@@ -37,8 +37,8 @@ function Menu({ navigate }: { navigate: (path: any) => void }) {
   const authorized = useSelector(selectIsAuthorized)
   const dispatch = useAppDispatch()
 
-  const init = useCallback(async () => {
-    await dispatch(authorize()).unwrap()
+  const init = useCallback(() => {
+    dispatch(authorize())
   }, [authorize])
 
   return (

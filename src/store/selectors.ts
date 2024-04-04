@@ -12,7 +12,7 @@ export const selectUnsyncedTransactions = createSelector(
       if (acc[fund.name] === undefined) {
         acc[fund.name] = []
       }
-      acc[fund.name].push(...transactions[fund.id].filter((t) => !t.synced))
+      acc[fund.name].push(...transactions[fund.id].filter((t) => !t.synced && t.syncDate === undefined))
       return acc
     }, {})
   }
@@ -28,9 +28,11 @@ export const selectFundsChartData = createSelector(
         name: f.name,
         transactions: Object.keys(groups).map((month) => {
           const g = groups[month].map((t) => t.amount)
+          const sum = g.reduce((a, b) => a + b, 0)
           return {
             month,
-            avg: g.reduce((a, b) => a + b, 0) / groups[month].length,
+            sum,
+            avg: sum / groups[month].length,
             median: median(g.map((t) => t)),
           }
         }),

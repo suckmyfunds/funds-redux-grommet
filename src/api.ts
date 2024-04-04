@@ -6,6 +6,7 @@ import type {
   BatchRequest,
   BatchResponse,
   Fund,
+  FundRemote,
   RowData,
   SpreadSheet,
   Transaction,
@@ -233,9 +234,10 @@ export default class GoogleSpreadsheetAPI implements API {
 }
 
 //TODO: use https://github.com/Hookyns/tst-reflect for reflection and auto generation of those functions
-export function transformFundFromResponse(vals: string[]): Fund {
-  let [name, budget, _, __, initialBalance] = vals
+export function transformFundFromResponse(vals: string[]): FundRemote {
+  let [id, name, budget, _, __, initialBalance] = vals
   let result = {
+    id,
     name,
     budget: Number.parseFloat(budget),
     initialBalance: Number.parseFloat(initialBalance),

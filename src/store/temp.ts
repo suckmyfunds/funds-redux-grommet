@@ -18,11 +18,8 @@ export const tempSlice = createSlice({
       s.currentDate = a.payload
     },
     setCurrentFund: (s, a: { payload: string | undefined }) => {
+      console.log('reduce set cur fund', a.payload)
       s.currentFund = a.payload
     },
-  },
-  selectors: {
-    getCurrentDate: (s) => s.currentDate,
-    getCurrentFund: (s) => s.currentFund,
   },
 })

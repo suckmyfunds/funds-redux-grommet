@@ -8,12 +8,12 @@ import {
   nanoid,
 } from '@reduxjs/toolkit'
 
-import SheetAPI, { transactionToRequest, transformTransactionFromResponse } from '../api'
+import SheetAPI, { transactionToRequest, transactionToRequestObject, transformTransactionFromResponse } from '../api'
 import API from '../api'
 import { Transaction, TransactionRemote } from '../types'
 import { assert, dateToExcelFormat } from '../utils'
 import { RootState } from '.'
-import { selectFundById, selectFundByName, selectFundNamesById } from './fundsSlice'
+import { selectAllFunds, selectFundById, selectFundByName, selectFundNamesById } from './fundsSlice'
 import { clearLocals } from './globalActions'
 
 export const fetchTransactionsForFund = createAsyncThunk(
@@ -69,10 +69,45 @@ export const addTransactionToFund = createAsyncThunk(
     return { ...result, syncDate: dateToExcelFormat(new Date()) }
   }
 )
+// return ids of transtactions that was created
+export const makeMonthIncome = createAsyncThunk(
+  'transactions/makeMonthIncome',
+  async (payload: { date: string; amount?: number } | undefined, { getState, dispatch }): Promise<string[]> => {
+    const t: Transaction = {
+      date: payload?.date || dateToExcelFormat(new Date()),
+      amount: payload?.amount || 0,
+      description: 'На месяц',
+      synced: true,
+      type: 'INCOME',
+    }
+    const state: RootState = getState()
 
-export const makeMonthIncome = createAction('transactions/makeMonthIncome', (date?: string, amount?: number) => ({
-  payload: { date, amount },
-}))
+    const funds = selectAllFunds(state)
+    console.log('TRACE', funds)
+    const token = state.auth.token
+
+    const transactionsToCreate: TransactionRemote[] = funds.map(({ id, budget }) => ({
+      ...t,
+      id: nanoid(),
+      amount: -(t.amount !== 0 ? t.amount : budget),
+      fundId: id,
+    }))
+
+    dispatch(slice.actions.addMany(transactionsToCreate))
+
+    let api = new API(token)
+    await api.batchUpdate(
+      transactionsToCreate.map((t) => ({
+        appendCells: {
+          fields: '*',
+          sheetId: Number.parseInt(t.fundId),
+          rows: [transactionToRequestObject(t)],
+        },
+      }))
+    )
+    return transactionsToCreate.map((t) => t.id)
+  }
+)
 
 export const makeSync = createAction('transactions/sync', (id: string) => ({ payload: { id } }))
 
@@ -135,7 +170,7 @@ export const selectFundTransactions = createSelector(
 
 export const selectUnsyncedFundTransactions = createSelector(
   [selectAllTransactions, (_, fundId: string) => fundId],
-  (transactions, fundId) => transactions.filter((t) => t.fundId === fundId && !t.synced)
+  (transactions, fundId) => transactions.filter((t) => t.fundId === fundId && t.syncDate === undefined)
 )
 
 export const selectLocalTransactions = createSelector([selectAllTransactions], (transactions) =>
