@@ -1,19 +1,11 @@
-import {
-  createAction,
-  createAsyncThunk,
-  createEntityAdapter,
-  createReducer,
-  createSelector,
-  createSlice,
-  nanoid,
-} from '@reduxjs/toolkit'
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, nanoid } from '@reduxjs/toolkit'
 
 import SheetAPI, { transactionToRequest, transactionToRequestObject, transformTransactionFromResponse } from '../api'
 import API from '../api'
 import { Transaction, TransactionRemote } from '../types'
 import { assert, dateToExcelFormat } from '../utils'
 import { RootState } from '.'
-import { selectAllFunds, selectFundById, selectFundByName, selectFundNamesById } from './fundsSlice'
+import { selectFundById, selectFundByName, selectFundNamesById } from './fundsSlice'
 import { clearLocals } from './globalActions'
 
 export const fetchTransactionsForFund = createAsyncThunk(
@@ -62,54 +54,30 @@ export const addTransactionToFund = createAsyncThunk(
     const state: RootState = getState()
     const token = state.auth.token
     let api = new API(token)
-    const result = { ...payload, id: nanoid() }
+    const result: TransactionRemote = { ...payload, id: nanoid() }
     dispatch(slice.actions.add(result))
     const { name: fundName } = selectFundById(getState(), payload.fundId)
     await api.appendRow(fundName, transactionToRequest(result))
     return { ...result, syncDate: dateToExcelFormat(new Date()) }
   }
 )
-// return ids of transtactions that was created
-export const makeMonthIncome = createAsyncThunk(
-  'transactions/makeMonthIncome',
-  async (payload: { date: string; amount?: number } | undefined, { getState, dispatch }): Promise<string[]> => {
-    const t: Transaction = {
-      date: payload?.date || dateToExcelFormat(new Date()),
-      amount: payload?.amount || 0,
-      description: 'На месяц',
-      synced: true,
-      type: 'INCOME',
-    }
-    const state: RootState = getState()
 
-    const funds = selectAllFunds(state)
-    console.log('TRACE', funds)
-    const token = state.auth.token
-
-    const transactionsToCreate: TransactionRemote[] = funds.map(({ id, budget }) => ({
-      ...t,
-      id: nanoid(),
-      amount: -(t.amount !== 0 ? t.amount : budget),
-      fundId: id,
+export const sendTempTransactions = createAsyncThunk('transactions/sendTempTransactions', async (_, { getState }) => {
+  const token = (getState() as RootState).auth.token
+  let api = new API(token)
+  const today = dateToExcelFormat(new Date())
+  const transactions = selectUnsyncedTransactions(getState())
+  await api.batchUpdate(
+    Object.keys(transactions).map((fundId) => ({
+      appendCells: {
+        sheetId: Number.parseInt(fundId),
+        fields: '*',
+        rows: transactions[fundId].map(transactionToRequestObject),
+      },
     }))
-
-    dispatch(slice.actions.addMany(transactionsToCreate))
-
-    let api = new API(token)
-    await api.batchUpdate(
-      transactionsToCreate.map((t) => ({
-        appendCells: {
-          fields: '*',
-          sheetId: Number.parseInt(t.fundId),
-          rows: [transactionToRequestObject(t)],
-        },
-      }))
-    )
-    return transactionsToCreate.map((t) => t.id)
-  }
-)
-
-export const makeSync = createAction('transactions/sync', (id: string) => ({ payload: { id } }))
+  )
+  return { ids: Object.keys(transactions).flatMap((fid) => transactions[fid].map((t) => t.id)), date: today }
+})
 
 const adapter = createEntityAdapter({
   selectId: (t: TransactionRemote) => t.id,
@@ -124,11 +92,6 @@ const slice = createSlice({
     update: adapter.updateOne,
     replace: adapter.setAll,
     addMany: adapter.addMany,
-    sync: createReducer(adapter.getInitialState(), (builder) => {
-      builder.addCase(makeSync, (s, a) => {
-        s.entities[a.payload.id].synced = true
-      })
-    }),
   },
   extraReducers: (builder) => {
     builder
@@ -150,6 +113,15 @@ const slice = createSlice({
       .addCase(fetchTransactionsForFund.fulfilled, (s, { payload: transactions }) => {
         adapter.addMany(s, transactions)
       })
+      .addCase(sendTempTransactions.fulfilled, (s, { payload: { ids, date } }) => {
+        adapter.updateMany(
+          s,
+          ids.map((id) => ({ id, changes: { syncDate: date } }))
+        )
+      })
+      .addCase(sendTempTransactions.rejected, () => {
+        console.log('sendTempTransactions.rejected')
+      })
   },
 })
 
@@ -163,16 +135,11 @@ export const transactionsSlice = {
 
 export const { selectAll: selectAllTransactions } = selectors
 
-export const selectFundTransactions = createSelector(
-  [selectAllTransactions, (_, fundId: string) => fundId],
-  (transactions, fundId) => transactions.filter((t) => t.fundId === fundId).reverse()
-)
-
 export const selectUnsyncedFundTransactions = createSelector(
   [selectAllTransactions, (_, fundId: string) => fundId],
   (transactions, fundId) => transactions.filter((t) => t.fundId === fundId && t.syncDate === undefined)
 )
-
+/** returns transactions that not send to remote*/
 export const selectLocalTransactions = createSelector([selectAllTransactions], (transactions) =>
   transactions.filter((t) => t.syncDate === undefined)
 )
@@ -183,4 +150,10 @@ export const selectTransactionsByFundId = createSelector([selectAllTransactions]
     acc[t.fundId].push(t)
     return acc
   }, {})
+})
+
+export const selectUnsyncedTransactions = createSelector([selectTransactionsByFundId], (transactions) => {
+  const result: Record<string, TransactionRemote[]> = {}
+  Object.keys(transactions).forEach((k) => (result[k] = transactions[k].filter((t) => t.syncDate === undefined)))
+  return result
 })

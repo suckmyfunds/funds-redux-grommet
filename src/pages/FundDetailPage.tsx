@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 
 import FundComponent from '../components/Fund'
 import TransactionsTable from '../components/TransactionsTable'
-import { selectFundTransactions } from '../store/transactionsSlice'
+import { selectFundTransactions } from '../store/selectors'
 
 class ErrorBoundary extends React.Component<PropsWithChildren, { hasError: boolean }> {
   constructor(props: any) {

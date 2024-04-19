@@ -1,4 +1,4 @@
-import { combineReducers, configureStore, createReducer } from '@reduxjs/toolkit'
+import { combineReducers, configureStore, createAsyncThunk, createReducer, nanoid } from '@reduxjs/toolkit'
 import { useDispatch } from 'react-redux'
 import {
   createTransform,
@@ -12,11 +12,15 @@ import {
 } from 'reduxjs-toolkit-persist'
 import storage from 'reduxjs-toolkit-persist/lib/storage'
 
+import GoogleSpreadsheetAPI, { transactionToRequestObject } from '../api'
+import { Transaction, TransactionRemote } from '../types'
 import { dateToExcelFormat } from '../utils'
 import { authSlice } from './authSlice'
 import { fundsSlice } from './fundsSlice'
+import { selectAllFunds } from './selectors'
 import { tempSlice } from './temp'
-import { makeMonthIncome, transactionsSlice } from './transactionsSlice'
+import { transactionsSlice } from './transactionsSlice'
+export * from './selectors'
 
 const expireConfig = {
   expireKey: 'expiresAt',
@@ -61,6 +65,46 @@ const persistReducer_ = persistReducer(
   combinedReducer
 )
 
+// return ids of transtactions that was created
+export const makeMonthIncome = createAsyncThunk(
+  'transactions/makeMonthIncome',
+  async (payload: { date: string; amount?: number } | undefined, { getState, dispatch }): Promise<string[]> => {
+    const t: Transaction = {
+      date: payload?.date || dateToExcelFormat(new Date()),
+      amount: payload?.amount || 0,
+      description: 'На месяц',
+      synced: true,
+      type: 'INCOME',
+    }
+    const state: RootState = getState()
+
+    const funds = selectAllFunds(state)
+    console.log('TRACE', funds)
+    const token = state.auth.token
+
+    const transactionsToCreate: TransactionRemote[] = funds.map(({ id, budget }) => ({
+      ...t,
+      id: nanoid(),
+      amount: -(t.amount !== 0 ? t.amount : budget),
+      fundId: id,
+    }))
+
+    dispatch(transactionsSlice.actions.addMany(transactionsToCreate))
+
+    let api = new GoogleSpreadsheetAPI(token)
+    await api.batchUpdate(
+      transactionsToCreate.map((t) => ({
+        appendCells: {
+          fields: '*',
+          sheetId: Number.parseInt(t.fundId),
+          rows: [transactionToRequestObject(t)],
+        },
+      }))
+    )
+    return transactionsToCreate.map((t) => t.id)
+  }
+)
+
 // TODO: check that in this month income was done. Transaction should have a type?
 const newIncomeReducer = createReducer(initialState, (builder) => {
   builder.addCase(makeMonthIncome.fulfilled, (s, a) => {
@@ -89,4 +133,3 @@ export type AppDispatch = typeof store.dispatch
 export const useAppDispatch: () => AppDispatch = useDispatch
 
 export { authorize } from './authSlice'
-export { selectAllFunds } from './fundsSlice'

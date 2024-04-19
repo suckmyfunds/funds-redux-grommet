@@ -13,24 +13,13 @@ import FundDetailPage from './pages/FundDetailPage'
 import { FundsPage } from './pages/FundsPage'
 import StatsPage from './pages/Stats'
 import SyncPage from './pages/SyncPage'
-import { useAppDispatch } from './store'
+import { makeMonthIncome, useAppDispatch } from './store'
 import { authorize } from './store/authSlice'
 import { selectIsAuthorized } from './store/authSlice'
 import { fetchFunds } from './store/fundsSlice'
 import { clearLocals } from './store/globalActions'
-import { fetchTransactions, makeMonthIncome } from './store/transactionsSlice'
-// const AppBar = (props: any) => (
-//   <Box
-//     tag='header'
-//     direction='row'
-//     align='center'
-//     justify='between'
-//     background='light-2'
-//     pad={{ vertical: 'small', horizontal: 'medium' }}
-//     elevation='medium'
-//     {...props}
-//   />
-// );
+import { fetchTransactions, sendTempTransactions } from './store/transactionsSlice'
+
 function Menu({ navigate }: { navigate: (path: any) => void }) {
   const location = useLocation().pathname
   const size = useContext(ResponsiveContext)
@@ -84,7 +73,9 @@ export default function App() {
       dispatch(fetchFunds())
         .unwrap()
         .then(() => {
-          dispatch(fetchTransactions())
+          dispatch(sendTempTransactions())
+            .unwrap()
+            .then(() => dispatch(fetchTransactions()))
         })
     }
   }, [authorized, fetchFunds, fetchTransactions])

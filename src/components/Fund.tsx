@@ -3,7 +3,7 @@ import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useAppDispatch } from '../store'
-import { selectFund } from '../store/fundsSlice'
+import { selectFund } from '../store/selectors'
 import { addTransactionToFund } from '../store/transactionsSlice'
 import { dateToExcelFormat } from '../utils'
 import BudgetBar from './BudgetBar'
