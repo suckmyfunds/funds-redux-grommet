@@ -30,7 +30,15 @@ export default ({ data, withoutDate }: { data: TransactionRemote[]; withoutDate?
       {
         property: 'date',
         header: 'Date',
-        render: ({ date }: { date: Date }) => <Text>{date ? dateToExcelFormat(date) : null}</Text>,
+        render: ({ date }: { date: Date }) => {
+          if (!date) return null
+          try {
+            return <Text>{dateToExcelFormat(date)}</Text>
+          } catch (e) {
+            console.warn("can't format date", date)
+            return null
+          }
+        },
       },
       ...columns,
     ]
@@ -40,11 +48,18 @@ export default ({ data, withoutDate }: { data: TransactionRemote[]; withoutDate?
       size="small"
       primaryKey="id"
       columns={columns}
-      data={data.map((t) => ({
-        ...t,
-        date: dateFromExcelFormat(t.date),
-        month: `${dateFromExcelFormat(t.date).getMonth()}.${dateFromExcelFormat(t.date).getFullYear()}`,
-      }))}
+      data={data.map((t) => {
+        try {
+          dateToExcelFormat(dateFromExcelFormat(t.date))
+        } catch (e) {
+          console.warn('date issue', t)
+        }
+        return {
+          ...t,
+          date: dateFromExcelFormat(t.date),
+          month: `${dateFromExcelFormat(t.date).getMonth()}.${dateFromExcelFormat(t.date).getFullYear()}`,
+        }
+      })}
       onClickRow={({ datum }) => {
         if (datum.syncDate === undefined) {
           dispatch(transactionsSlice.actions.remove(datum.id))
