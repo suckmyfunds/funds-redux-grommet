@@ -252,7 +252,7 @@ export function transformTransactionFromResponse(vals: string[]): Transaction {
   const amount = parseFloat(amount_.replace(',', '.'))
   let type: 'EXPENSE' | 'INCOME' = 'EXPENSE'
 
-  if (type_ === undefined || type_.toUpperCase() == 'INCOME' || amount < 0) {
+  if (amount < 0 && (type_ === undefined || type_.toUpperCase() == 'INCOME')) {
     type = 'INCOME'
   }
   // TODO: GET ID
