@@ -60,13 +60,7 @@ function Menu({ navigate }: { navigate: (path: any) => void }) {
 export default function App() {
   const authorized = useSelector(selectIsAuthorized)
   const dispatch = useAppDispatch()
-  const size = useContext(ResponsiveContext)
-
-  //const synchronization = useSelector(isSynchronizing)
-  //const isFirstMonthDay = new Date().getDate() === 1
-  console.log('SIZE', size)
   const navigate = useNavigate()
-  //const location = useLocation().pathname
 
   useEffect(() => {
     if (authorized) {
