@@ -67,6 +67,11 @@ export const sendTempTransactions = createAsyncThunk('transactions/sendTempTrans
   let api = new API(token)
   const today = dateToExcelFormat(new Date())
   const transactions = selectUnsyncedTransactions(getState())
+  if (Object.keys(transactions).length < 1) {
+    return { ids: [], date: today }
+  }
+  console.warn('got temp transactions', transactions)
+
   await api.batchUpdate(
     Object.keys(transactions).map((fundId) => ({
       appendCells: {
@@ -154,6 +159,9 @@ export const selectTransactionsByFundId = createSelector([selectAllTransactions]
 
 export const selectUnsyncedTransactions = createSelector([selectTransactionsByFundId], (transactions) => {
   const result: Record<string, TransactionRemote[]> = {}
-  Object.keys(transactions).forEach((k) => (result[k] = transactions[k].filter((t) => t.syncDate === undefined)))
+  Object.keys(transactions).forEach((k) => {
+    const unsync = transactions[k].filter((t) => t.syncDate === undefined)
+    if (unsync.length > 0) result[k] = unsync
+  })
   return result
 })
