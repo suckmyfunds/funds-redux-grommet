@@ -15,8 +15,47 @@ import { CalendarDayBox } from './CalendarDayBox'
 
 export const FillTransactions = () => {
   const isMobile = useMediaQuery(`(max-width: ${em(1100)})`)
+
+  const dispatch = useAppDispatch()
+  const setDate = useCallback(
+    (date: Date) => {
+      dispatch(tempSlice.actions.setDate(dateToExcelFormat(date)))
+    },
+    [dispatch]
+  )
+
+  const date: string = useSelector((s: RootState) => s.temp.currentDate)
+
+  const onSelectDate = (nextDate: any) => {
+    setDate(new Date(nextDate))
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.shiftKey) {
+      if (event.key === 'ArrowLeft') {
+        e
+      } else if (event.key === 'ArrowRight') {
+        console.log('right')
+      } else if (event.key === 'ArrowDown') {
+        console.log('down')
+      } else if (event.key === 'ArrowUp') {
+        console.log('up')
+      }
+    } else {
+      if (event.key === 'ArrowLeft') {
+        onSelectDate(dateFromExcelFormat(date).getTime() - 24 * 60 * 60 * 1000)
+      } else if (event.key === 'ArrowRight') {
+        onSelectDate(dateFromExcelFormat(date).getTime() + 24 * 60 * 60 * 1000)
+      } else if (event.key === 'ArrowDown') {
+        onSelectDate(dateFromExcelFormat(date).getTime() + 7 * 24 * 60 * 60 * 1000)
+      } else if (event.key === 'ArrowUp') {
+        onSelectDate(dateFromExcelFormat(date).getTime() - 7 * 24 * 60 * 60 * 1000)
+      }
+    }
+  }
+
   return (
-    <Grid>
+    <Grid onKeyDown={handleKeyDown}>
       {isMobile ? (
         <>
           <Grid.Col span={12}>
@@ -56,7 +95,7 @@ function FundsSelection() {
   const createTransaction = useCallback(
     ({ description, amount }: { description: string; amount: string }) => {
       if (currentFundId === undefined) return
-      dispatch(
+      return dispatch(
         transactionsSlice.actions.add({
           fundId: currentFundId!,
           description,
@@ -124,7 +163,9 @@ function Calendar() {
     },
     [dispatch]
   )
+
   const date: string = useSelector((s: RootState) => s.temp.currentDate)
+
   const onSelectDate = (nextDate: any) => {
     setDate(new Date(nextDate))
   }
