@@ -3,14 +3,14 @@ import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
 import { useAppDispatch } from '../store'
-import { selectFund } from '../store/selectors'
+import { selectFund, selectFundAVGExpense } from '../store/selectors'
 import { addTransactionToFund } from '../store/transactionsSlice'
 import { dateToExcelFormat } from '../utils'
 import BudgetBar from './BudgetBar'
 import TransactionEditor from './TransactionEditor'
 
 export default function Fund({ fundId, onClick }: { fundId: string; onClick?: () => void }) {
-  const { name, budget, balance, synced, initialBalance } = useSelector((s) => selectFund(s, fundId))
+  const { name, budget, balance, synced } = useSelector((s) => selectFund(s, fundId))
   const handleOnClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
@@ -19,6 +19,7 @@ export default function Fund({ fundId, onClick }: { fundId: string; onClick?: ()
     },
     [onClick]
   )
+  const avgExpense = useSelector((s) => selectFundAVGExpense(s, fundId))
 
   const dispatch = useAppDispatch()
   const createTransaction = useCallback(
@@ -54,11 +55,13 @@ export default function Fund({ fundId, onClick }: { fundId: string; onClick?: ()
           <Box flex direction="row">
             <Stack>
               <Text>{name}</Text>
+              {/* <Text>initial: {initialBalance?.toFixed(2)}</Text> */}
               {synced && <Box background="status-critical" pad={{ horizontal: 'xsmall' }} round></Box>}
             </Stack>
           </Box>
-          <Box>
-            {budget.toFixed(2)}({initialBalance?.toFixed(2)})
+          <Box direction="row" gap={'xsmall'}>
+            <Text>{budget.toFixed(2)}</Text>
+            <Text color={budget >= avgExpense ? 'green' : 'red'}>(~ {avgExpense.toFixed(2)})</Text>
           </Box>
         </Box>
         <Box gridArea="balance" gap="small">

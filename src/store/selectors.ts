@@ -33,6 +33,26 @@ export const selectFundTransactions = createSelector(
   (transactions, fundId) => transactions.filter((t) => t.fundId === fundId).reverse()
 )
 
+export const getTransactionExpencesByMonth = (transactions: TransactionRemote[]):Record<string,number> => {
+  const onlyExpenses = (t: TransactionRemote) => t.amount > 0
+  const groups = groupBy(transactions, (t) => {
+    const date = dateFromExcelFormat(t.date)
+    return `${date.getMonth() + 1}.${date.getFullYear() - 2000}`
+  })
+  let result: Record<string,number> = {}
+  
+  Object.keys(groups).forEach((month) => {
+    const monthSpends = groups[month].filter(onlyExpenses).map((t) => t.amount)
+     result[month] = monthSpends.reduce((a, b) => a + b, 0)
+  })
+  return result
+}
+export const getTransactionsAVG = (transactions: TransactionRemote[]):number => {
+  const sums = getTransactionExpencesByMonth(transactions)
+
+  return (Object.values(sums).reduce((a, b) => a + b, 0))/Object.keys(sums).length
+}
+
 export const getFundChartData = (transactions: TransactionRemote[], treshhold: number = 0, fund: Fund) => {
   const onlyExpenses = (t: TransactionRemote) => t.amount > 0 && t.amount <= (treshhold == 0 ? Number.MAX_VALUE : treshhold)
   const groups = groupBy(transactions, (t) => {
@@ -42,6 +62,10 @@ export const getFundChartData = (transactions: TransactionRemote[], treshhold: n
   let avgWindow: number[] = []
   let balance = fund.initialBalance
   const avgWindowSize = 4
+  
+  const sums = getTransactionExpencesByMonth(transactions)
+  const avg = (Object.values(sums).reduce((a, b) => a + b, 0))/Object.keys(sums).length
+  const medianValue = median(Object.values(sums))
   return {
     transactions: Object.keys(groups).map((month) => {
       const amounts = groups[month].filter(onlyExpenses).map((t) => t.amount)
@@ -52,13 +76,18 @@ export const getFundChartData = (transactions: TransactionRemote[], treshhold: n
       return {
         date: month,
         spended,
-        avg: avgWindow.reduce((a, b) => a + b, 0) / avgWindow.length,
+        avg: avg,
         balance,
-        median: median(amounts.map((t) => t)),
+        median: medianValue,
       }
     }),
   }
 }
+
+export const selectFundAVGExpense = createSelector(
+  [selectFundTransactions],
+  (transactions) => getTransactionsAVG(transactions)
+)
 
 export const selectTransactionsOnDate = createSelector(
   [selectTransactionsByFundId, (_, date: Date, fundId?: string) => ({ date: date, fundId })],

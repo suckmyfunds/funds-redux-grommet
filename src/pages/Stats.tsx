@@ -29,7 +29,7 @@ export default function StatsPage() {
             },
           },
           legend: {
-            data: ['spended', 'budget', 'balance'],
+            data: ['spended', 'budget', 'balance', 'median', 'avg'],
           },
           grid: {
             left: '10%',
@@ -50,7 +50,7 @@ export default function StatsPage() {
             {
               type: 'line',
               name: 'spended',
-              data: [...transactions.map(({ spended }) => spended)],
+              data: [...transactions.map((d) => d.spended)],
             },
             {
               type: 'line',
@@ -60,7 +60,17 @@ export default function StatsPage() {
             {
               type: 'line',
               name: 'balance',
-              data: [...transactions.map(({ balance }) => balance)],
+              data: [...transactions.map((d) => d.balance)],
+            },
+            {
+              type: 'line',
+              name: 'median',
+              data: [...transactions.map((d) => d.median)],
+            },
+            {
+              type: 'line',
+              name: 'avg',
+              data: [...transactions.map((d) => d.avg)],
             },
           ],
         },
@@ -75,7 +85,7 @@ export default function StatsPage() {
       {chartsData.map(({ name, data }) => (
         <Stack gap="xs" key={name}>
           <Text>{name}</Text>
-          <ECharts option={data} style={{ width: '100%', height: '300px' }} />
+          <ECharts option={data} style={{ width: '100%', height: '800px' }} />
         </Stack>
       ))}
     </Stack>

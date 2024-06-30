@@ -173,7 +173,7 @@ export interface SpreadSheet {
  * of the planned date based on the expenses that have occurred.
  *
  */
-export interface Target {
+export interface PlannedExpense {
   name: string
   price: number
   fundId: string
@@ -182,4 +182,12 @@ export interface Target {
   shiftedDate: Date
 }
 
-export type TargetRemote = Target & Entity
+export type PlannedExpenseRemote = PlannedExpense & Entity
+
+
+export interface Account {
+  name: string
+  balance: number
+}
+
+export type AccountRemote = Account & Entity
