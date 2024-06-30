@@ -29,7 +29,7 @@ export default function StatsPage() {
             },
           },
           legend: {
-            data: ['sum', 'budget', 'avg'],
+            data: ['spended', 'budget', 'balance'],
           },
           grid: {
             left: '10%',
@@ -49,8 +49,8 @@ export default function StatsPage() {
           series: [
             {
               type: 'line',
-              name: 'sum',
-              data: [...transactions.map(({ sum }) => sum)],
+              name: 'spended',
+              data: [...transactions.map(({ spended }) => spended)],
             },
             {
               type: 'line',
@@ -59,8 +59,8 @@ export default function StatsPage() {
             },
             {
               type: 'line',
-              name: 'avg',
-              data: [...transactions.map(({ avg }) => avg)],
+              name: 'balance',
+              data: [...transactions.map(({ balance }) => balance)],
             },
           ],
         },

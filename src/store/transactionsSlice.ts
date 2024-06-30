@@ -35,6 +35,7 @@ export const fetchTransactions = createAsyncThunk(
     const fundNames = selectFundNamesById(rootState)
     const fundIds = Object.keys(fundNames)
     return (await api.batchGet(fundIds.map((id) => `${fundNames[id]}!A2:E`))).valueRanges.flatMap((trs, fundIdx) => {
+      if (!trs.values) return []
       return trs.values.map((t) => {
         return {
           ...transformTransactionFromResponse(t),

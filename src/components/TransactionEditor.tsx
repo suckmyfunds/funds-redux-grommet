@@ -17,7 +17,6 @@ export default function TransactionEditor({
   const inputRefFocus: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
   const submitButtonRef: React.MutableRefObject<HTMLButtonElement | null> = useRef(null)
   const canSubmit = useMemo(() => amount !== '' && description !== '' && !disabled, [amount, description, disabled])
-  const [currentDate, setCurrentDate] = useState(new Date())
 
   const [debounce, setDebounce] = useState(false)
   const onClick = useCallback(

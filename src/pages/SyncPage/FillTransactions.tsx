@@ -33,7 +33,7 @@ export const FillTransactions = () => {
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.shiftKey) {
       if (event.key === 'ArrowLeft') {
-        e
+        console.log('left')
       } else if (event.key === 'ArrowRight') {
         console.log('right')
       } else if (event.key === 'ArrowDown') {

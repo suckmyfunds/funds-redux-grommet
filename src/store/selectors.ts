@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit'
 
-import { TransactionRemote } from '../types'
+import { Fund, TransactionRemote } from '../types'
 import { compareDates, dateFromExcelFormat, groupBy, median } from '../utils'
 import { selectAllFundsBase, selectFundById } from './fundsSlice'
 import { selectAllTransactions, selectTransactionsByFundId } from './transactionsSlice'
@@ -33,24 +33,27 @@ export const selectFundTransactions = createSelector(
   (transactions, fundId) => transactions.filter((t) => t.fundId === fundId).reverse()
 )
 
-export const getFundChartData = (transactions: TransactionRemote[], treshhold: number = 0) => {
-  const trs = transactions.filter((t) => t.amount > 0 && t.amount <= (treshhold == 0 ? Number.MAX_VALUE : treshhold))
-  const groups = groupBy(trs, (t) => {
+export const getFundChartData = (transactions: TransactionRemote[], treshhold: number = 0, fund: Fund) => {
+  const onlyExpenses = (t: TransactionRemote) => t.amount > 0 && t.amount <= (treshhold == 0 ? Number.MAX_VALUE : treshhold)
+  const groups = groupBy(transactions, (t) => {
     const date = dateFromExcelFormat(t.date)
     return `${date.getMonth() + 1}.${date.getFullYear() - 2000}`
   })
   let avgWindow: number[] = []
+  let balance = fund.initialBalance
   const avgWindowSize = 4
   return {
     transactions: Object.keys(groups).map((month) => {
-      const amounts = groups[month].map((t) => t.amount)
-      const sum = amounts.reduce((a, b) => a + b, 0)
-      avgWindow.push(sum)
+      const amounts = groups[month].filter(onlyExpenses).map((t) => t.amount)
+      const spended = amounts.reduce((a, b) => a + b, 0)
+      balance += groups[month].reduce((a, b) => a - b.amount, 0)
+      avgWindow.push(spended)
       if (avgWindow.length > avgWindowSize) avgWindow.shift()
       return {
         date: month,
-        sum,
+        spended,
         avg: avgWindow.reduce((a, b) => a + b, 0) / avgWindow.length,
+        balance,
         median: median(amounts.map((t) => t)),
       }
     }),
@@ -79,12 +82,12 @@ export const selectFundsChartData = createSelector(
   [selectTransactionsByFundId, selectAllFunds, (_, treshhold: number) => treshhold],
   (transactions, funds, treshhold) =>
     funds.map((f) => {
-      return { ...getFundChartData(transactions[f.id], treshhold), name: f.name, budget: f.budget }
+      return { ...getFundChartData(transactions[f.id], treshhold, f), name: f.name, budget: f.budget }
     })
 )
 
 export const selectFundChartData = createSelector([selectFundById, selectFundTransactions], (fund, transactions) => ({
-  ...getFundChartData(transactions),
+  ...getFundChartData(transactions, 0, fund),
   name: fund.name,
   budget: fund.budget,
 }))

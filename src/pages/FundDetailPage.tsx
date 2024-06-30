@@ -64,8 +64,8 @@ export default function FundDetailPage() {
       series: [
         {
           type: 'line',
-          name: 'sum',
-          data: [...fundData.transactions.map(({ sum }) => sum)],
+          name: 'spended',
+          data: [...fundData.transactions.map(({ spended }) => spended)],
         },
         {
           type: 'line',
