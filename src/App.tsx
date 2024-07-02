@@ -19,6 +19,7 @@ import { selectIsAuthorized } from './store/authSlice'
 import { fetchFunds } from './store/fundsSlice'
 import { clearLocals } from './store/globalActions'
 import { fetchTransactions, sendTempTransactions } from './store/transactionsSlice'
+import Accounts from './pages/Accounts'
 
 function Menu({ navigate }: { navigate: (path: any) => void }) {
   const location = useLocation().pathname
@@ -29,7 +30,6 @@ function Menu({ navigate }: { navigate: (path: any) => void }) {
   const init = useCallback(() => {
     dispatch(authorize())
   }, [authorize])
-
   return (
     <Container size="md">
       <Stack>
@@ -47,6 +47,10 @@ function Menu({ navigate }: { navigate: (path: any) => void }) {
         <Button size={size} onClick={() => navigate('/stats')} disabled={location == '/stats'}>
           Stats
         </Button>
+        <Button size={size} onClick={() => navigate('/accounts')} disabled={location == '/accounts'}>
+          Accounts
+        </Button>
+
         <ActionButton size={size} actionCreator={clearLocals} variant="outline" color="red">
           Fix
         </ActionButton>
@@ -75,6 +79,16 @@ export default function App() {
   }, [authorized, fetchFunds, fetchTransactions])
 
   const [opened, { toggle }] = useDisclosure()
+
+  const navigate_ = useCallback(
+    (path: string) => {
+      navigate(path)
+      console.log("burger state", opened)
+      toggle()
+    },
+    [opened]
+  )
+  
   return (
     <AppShell
       header={{ height: 60 }}
@@ -89,7 +103,7 @@ export default function App() {
         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
       </AppShell.Header>
       <AppShell.Navbar>
-        <Menu navigate={navigate} />
+        <Menu navigate={navigate_} />
       </AppShell.Navbar>
       <AppShell.Main>
         <Routes>
@@ -97,6 +111,7 @@ export default function App() {
           <Route path="/detail/:id" element={<FundDetailPage />} />
           <Route path="/sync" element={<SyncPage />} />
           <Route path="/stats" element={<StatsPage />} />
+          <Route path="/accounts" element={<Accounts />} />
         </Routes>
       </AppShell.Main>
     </AppShell>

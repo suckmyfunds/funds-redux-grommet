@@ -8,6 +8,7 @@ export interface Entity {
   syncDate?: string
 }
 
+
 export interface Notification {
   type: string
   message: string
@@ -29,6 +30,7 @@ export interface Transaction {
   description: string
   synced: boolean
   type: 'INCOME' | 'EXPENSE'
+  fromAccount?: string
 }
 
 export type TransactionRemote = Transaction & Entity & { fundId: string }
@@ -187,7 +189,9 @@ export type PlannedExpenseRemote = PlannedExpense & Entity
 
 export interface Account {
   name: string
-  balance: number
+  initialBalance: number
 }
 
+
 export type AccountRemote = Account & Entity
+export type AccountComputed = AccountRemote & {balance: number}

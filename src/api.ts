@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 
 import type {
+  Account,
   AddSheetResponse,
   BatchGetResponse,
   BatchRequest,
@@ -11,8 +12,10 @@ import type {
   SpreadSheet,
   Transaction,
   UpdateResponse,
-  ValuesRange,
+  ValuesRange
 } from './types'
+
+import { floatToExcelString } from './utils'
 
 const SHEET_ID = '16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ'
 
@@ -268,7 +271,7 @@ export function transformTransactionFromResponse(vals: string[]): Transaction {
 export function fundToRequest(fund: Fund) {
   return [
     fund.name,
-    String(fund.budget),
+    floatToExcelString(fund.budget),
     `=B4-SUM(INDIRECT("$A4")&"!$A$2:$A")`,
     '=NOT(XLOOKUP(FALSE;INDIRECT($A4&"!$D:$D");INDIRECT($A4&"!$D:$D");TRUE))',
   ]
@@ -286,8 +289,9 @@ export function fundToRequestObject(fund: Fund): RowData {
 }
 
 export function transactionToRequest(transaction: Transaction) {
+
   return [
-    String(transaction.amount),
+    floatToExcelString(transaction.amount),
     transaction.date,
     transaction.description,
     transaction.synced ? 'TRUE' : 'FALSE',
@@ -302,6 +306,7 @@ export function transactionToRequestObject(transaction: Transaction): RowData {
       { userEnteredValue: { stringValue: transaction.date } },
       { userEnteredValue: { stringValue: transaction.description } },
       { userEnteredValue: { boolValue: transaction.synced } },
+      { userEnteredValue: { stringValue: transaction.fromAccount || 'input' } },
     ],
   }
 }
@@ -355,3 +360,18 @@ export async function auth(): Promise<Token> {
 //   window.localStorage.removeItem("expires")
 //   return {token: "", expires_in: 0};
 // }
+
+export function transformAccountFromResponse(account: string[]): Account {
+  const [name, balance] = account
+  return {
+    name,
+    initialBalance: Number.parseFloat(balance.replace(',', '.')),
+  }
+}
+
+export function transformAccountToResponse(account: Account): string[] {
+  return [
+    account.name,
+    floatToExcelString(account.initialBalance),
+  ]
+}

@@ -85,3 +85,12 @@ export function compareDates(a: Date, b: Date) {
   }
   return a.getDate() - b.getDate()
 }
+
+
+export function floatToExcelString(float: number) {
+  return float.toString().replace('.', ',')
+}
+
+export function floatFromExcelString(str: string) {
+  return parseFloat(str.replace(',', '.'))
+}

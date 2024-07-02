@@ -20,6 +20,7 @@ import { fundsSlice } from './fundsSlice'
 import { selectAllFunds } from './selectors'
 import { tempSlice } from './temp'
 import { transactionsSlice } from './transactionsSlice'
+import { accountsSlice } from './accountsSlice'
 export * from './selectors'
 
 const expireConfig = {
@@ -35,12 +36,14 @@ const combinedReducer = combineReducers({
   [fundsSlice.reducerPath]: fundsSlice.reducer,
   [transactionsSlice.reducerPath]: transactionsSlice.reducer,
   [tempSlice.reducerPath]: tempSlice.reducer,
+  [accountsSlice.reducerPath]: accountsSlice.reducer,
 })
 
 export const initialState = {
   [authSlice.reducerPath]: authSlice.initialState,
   [fundsSlice.reducerPath]: fundsSlice.initialState,
   [transactionsSlice.reducerPath]: transactionsSlice.initialState,
+  [accountsSlice.reducerPath]: accountsSlice.initialState,
 }
 
 const persistReducer_ = persistReducer(
@@ -75,6 +78,7 @@ export const makeMonthIncome = createAsyncThunk(
       description: 'На месяц',
       synced: true,
       type: 'INCOME',
+      fromAccount: 'input'
     }
     const state: RootState = getState()
 
@@ -87,6 +91,7 @@ export const makeMonthIncome = createAsyncThunk(
       id: nanoid(),
       amount: -(t.amount !== 0 ? t.amount : budget),
       fundId: id,
+      fromAccount: 'input'
     }))
 
     dispatch(transactionsSlice.actions.addMany(transactionsToCreate))
