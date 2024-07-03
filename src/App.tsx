@@ -29,37 +29,35 @@ function Menu({ navigate }: { navigate: (path: any) => void }) {
     dispatch(authorize())
   }, [authorize])
   return (
-    <Container size="md">
-      <Stack>
-        {!authorized && (
-          <Button variant="filled" onClick={init}>
-            Authorize
-          </Button>
-        )}
-        <Button size={size} onClick={() => navigate('/')} disabled={location == '/'} variant="fill">
-          Home
+    <Stack>
+      {!authorized && (
+        <Button variant="filled" onClick={init}>
+          Authorize
         </Button>
-        <Button size={size} onClick={() => navigate('/sync')} disabled={location == '/sync'}>
-          Sync
-        </Button>
-        <Button size={size} onClick={() => navigate('/stats')} disabled={location == '/stats'}>
-          Stats
-        </Button>
-        <Button size={size} onClick={() => navigate('/accounts')} disabled={location == '/accounts'}>
-          Accounts
-        </Button>
+      )}
+      <Button size={size} onClick={() => navigate('/')} disabled={location == '/'} variant="fill">
+        Home
+      </Button>
+      <Button size={size} onClick={() => navigate('/sync')} disabled={location == '/sync'}>
+        Sync
+      </Button>
+      <Button size={size} onClick={() => navigate('/stats')} disabled={location == '/stats'}>
+        Stats
+      </Button>
+      <Button size={size} onClick={() => navigate('/accounts')} disabled={location == '/accounts'}>
+        Accounts
+      </Button>
 
-        <ActionButton size={size} actionCreator={clearLocals} variant="outline" color="red">
-          Fix
-        </ActionButton>
-        <ActionButton size={size} actionCreator={makeMonthIncome}>
-          New Month
-        </ActionButton>
-        <Button size={size} onClick={() => navigate('/new-fund')}>
-          Add Fund
-        </Button>
-      </Stack>
-    </Container>
+      <ActionButton size={size} actionCreator={clearLocals} variant="outline" color="red">
+        Fix
+      </ActionButton>
+      <ActionButton size={size} actionCreator={makeMonthIncome}>
+        New Month
+      </ActionButton>
+      <Button size={size} onClick={() => navigate('/new-fund')}>
+        Add Fund
+      </Button>
+    </Stack>
   )
 }
 export default function App() {
@@ -108,7 +106,7 @@ export default function App() {
       }}
       padding="md"
     >
-      <AppShell.Header>
+      <AppShell.Header p='sm'>
         <Flex align="center" gap="sm">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Stack gap="0">
@@ -120,7 +118,7 @@ export default function App() {
           </Stack>
         </Flex>
       </AppShell.Header>
-      <AppShell.Navbar>
+      <AppShell.Navbar p='sm'>
         <Menu navigate={navigate_} />
       </AppShell.Navbar>
       <AppShell.Main>

@@ -1,6 +1,5 @@
-import { Button, Group, TextInput } from '@mantine/core'
-import { ResponsiveContext } from 'grommet'
-import React, { useCallback, useContext, useMemo, useRef, useState } from 'react'
+import { Button, Group, TextInput } from '@mantine/core';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 
 const floatRegExp = new RegExp('^-?[0-9]*([0-9]{1}[.,][0-9]{0,2})?$')
 
@@ -13,7 +12,6 @@ export default function TransactionEditor({
 }) {
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
-  const size = useContext(ResponsiveContext)
   const inputRefFocus: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
   const submitButtonRef: React.MutableRefObject<HTMLButtonElement | null> = useRef(null)
   const canSubmit = useMemo(() => amount !== '' && description !== '' && !disabled, [amount, description, disabled])
@@ -54,13 +52,12 @@ export default function TransactionEditor({
   }
 
   return (
-    <Group wrap="nowrap" gap={0} onKeyUp={onClick} onClick={onClick}>
+    <Group wrap="nowrap" gap='xs' onKeyUp={onClick} onClick={onClick}>
       <TextInput
         ref={inputRefFocus}
         type="text"
         placeholder="amount"
         name="amount"
-        size={size}
         value={amount}
         onChange={onChangeAmount}
         autoFocus={true}
@@ -69,7 +66,6 @@ export default function TransactionEditor({
         type="text"
         placeholder="description"
         name="desctiprion"
-        size={size}
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />

@@ -1,4 +1,4 @@
-import { Box, Card, Chip, Flex, Indicator, Stack, Text } from '@mantine/core'
+import { Box, Card, Chip, Flex, Group, Indicator, Stack, Text } from '@mantine/core'
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
@@ -40,23 +40,22 @@ export default function Fund({ fundId, onClick }: { fundId: string; onClick?: ()
 
   return (
     <Card padding="lg" withBorder>
-      <Flex justify="space-between">
-        <Flex onClick={handleOnClick}>
-          <Indicator color="red" disabled={synced}>
-            <Text>{name}</Text>
-            {/* <Text>initial: {initialBalance?.toFixed(2)}</Text> */}
-          </Indicator>
+      <Stack>
+        <Flex justify="space-between">
+          <Flex onClick={handleOnClick}>
+            {/* <Indicator color="red" disabled={synced} zIndex={10} size='7'> */}
+              <Text>{name}</Text>
+              {/* <Text>initial: {initialBalance?.toFixed(2)}</Text> */}
+            {/* </Indicator> */}
+          </Flex>
+          <Group gap="xs">
+            <Text>{budget.toFixed(2)}</Text>
+            <Text color={budget >= avgExpense ? 'green' : 'red'}>(~ {avgExpense.toFixed(2)})</Text>
+          </Group>
         </Flex>
-        <Flex gap="xs">
-          <Text>{budget.toFixed(2)}</Text>
-          <Text color={budget >= avgExpense ? 'green' : 'red'}>(~ {avgExpense.toFixed(2)})</Text>
-        </Flex>
-      </Flex>
-      <Stack align="stretch" gap="xs">
-        <Text>{balance.toFixed(2)}</Text>
         <BudgetBar budget={budget} balance={balance} warnPercent={15} />
+        <TransactionEditor onSubmit={createTransaction} />
       </Stack>
-      <TransactionEditor onSubmit={createTransaction} />
     </Card>
   )
 }
