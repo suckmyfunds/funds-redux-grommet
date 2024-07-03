@@ -30,27 +30,32 @@ export const selectTransactionsForAccountSync = createSelector(
 
 export const selectFundTransactions = createSelector(
   [selectAllTransactions, (_, fundId: string) => fundId],
-  (transactions, fundId) => transactions.filter((t) => t.fundId === fundId).reverse()
+  (transactions, fundId) => {
+
+    return transactions.filter((t) => t.fundId === fundId).reverse()
+  }
 )
 
-export const getTransactionExpencesByMonth = (transactions: TransactionRemote[]):Record<string,number> => {
+export const getTransactionExpencesByMonth = (transactions: TransactionRemote[]): Record<string, number> => {
   const onlyExpenses = (t: TransactionRemote) => t.amount > 0
   const groups = groupBy(transactions, (t) => {
     const date = dateFromExcelFormat(t.date)
     return `${date.getMonth() + 1}.${date.getFullYear() - 2000}`
   })
-  let result: Record<string,number> = {}
-  
+  let result: Record<string, number> = {}
+
   Object.keys(groups).forEach((month) => {
     const monthSpends = groups[month].filter(onlyExpenses).map((t) => t.amount)
-     result[month] = monthSpends.reduce((a, b) => a + b, 0)
+    result[month] = monthSpends.reduce((a, b) => a + b, 0)
   })
   return result
 }
-export const getTransactionsAVG = (transactions: TransactionRemote[]):number => {
+export const getTransactionsAVG = (transactions: TransactionRemote[]): number => {
   const sums = getTransactionExpencesByMonth(transactions)
-
-  return (Object.values(sums).reduce((a, b) => a + b, 0))/Object.keys(sums).length
+  if (Object.keys(sums).length == 0) {
+    return 0
+  }
+  return (Object.values(sums).reduce((a, b) => a + b, 0)) / Object.keys(sums).length
 }
 
 export const getFundChartData = (transactions: TransactionRemote[], treshhold: number = 0, fund: Fund) => {
@@ -62,9 +67,9 @@ export const getFundChartData = (transactions: TransactionRemote[], treshhold: n
   let avgWindow: number[] = []
   let balance = fund.initialBalance
   const avgWindowSize = 4
-  
+
   const sums = getTransactionExpencesByMonth(transactions)
-  const avg = (Object.values(sums).reduce((a, b) => a + b, 0))/Object.keys(sums).length
+  const avg = (Object.values(sums).reduce((a, b) => a + b, 0)) / Object.keys(sums).length
   const medianValue = median(Object.values(sums))
   return {
     transactions: Object.keys(groups).map((month) => {
@@ -98,12 +103,13 @@ export const selectTransactionsOnDate = createSelector(
 )
 
 export const selectFund = createSelector([selectFundById, selectFundTransactions], (fund, transactions) => {
+  // console.log("selectFund", fund.name, transactions)
   return {
     ...fund,
     // transaction amount for expenses is negative, so we need to add it to balance
     balance: fund.initialBalance - transactions.reduce((a, b) => a + b.amount, 0),
     synced: transactions.every((t) => t.synced),
-    transactions,
+    transactions: transactions,
   }
 })
 

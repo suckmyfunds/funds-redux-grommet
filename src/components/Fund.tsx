@@ -1,4 +1,4 @@
-import { Box, Card, Grid, Stack, Text } from 'grommet'
+import { Box, Card, Chip, Flex, Indicator, Stack, Text } from '@mantine/core'
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
@@ -39,41 +39,24 @@ export default function Fund({ fundId, onClick }: { fundId: string; onClick?: ()
   )
 
   return (
-    <Card>
-      <Grid
-        rows={['auto', '3fr', 'auto']}
-        pad={'20px'}
-        columns={['3fr', '1fr']}
-        gap={'10px'}
-        areas={[
-          { name: 'name', start: [0, 0], end: [2, 0] },
-          { name: 'balance', start: [0, 1], end: [2, 1] },
-          { name: 'transactions', start: [0, 2], end: [2, 2] },
-        ]}
-      >
-        <Box gridArea="name" direction="row" flex fill="horizontal" onClick={handleOnClick} wrap>
-          <Box flex direction="row">
-            <Stack>
-              <Text>{name}</Text>
-              {/* <Text>initial: {initialBalance?.toFixed(2)}</Text> */}
-              {synced && <Box background="status-critical" pad={{ horizontal: 'xsmall' }} round></Box>}
-            </Stack>
-          </Box>
-          <Box direction="row" gap={'xsmall'}>
-            <Text>{budget.toFixed(2)}</Text>
-            <Text color={budget >= avgExpense ? 'green' : 'red'}>(~ {avgExpense.toFixed(2)})</Text>
-          </Box>
-        </Box>
-        <Box gridArea="balance" gap="small">
-          <Box direction="column" fill align="center">
-            <Text>{balance.toFixed(2)}</Text>
-            <BudgetBar budget={budget} balance={balance} warnPercent={15} />
-          </Box>
-        </Box>
-        <Box gridArea="transactions">
-          <TransactionEditor onSubmit={createTransaction} />
-        </Box>
-      </Grid>
+    <Card padding="lg" withBorder>
+      <Flex justify="space-between">
+        <Flex onClick={handleOnClick}>
+          <Indicator color="red" disabled={synced}>
+            <Text>{name}</Text>
+            {/* <Text>initial: {initialBalance?.toFixed(2)}</Text> */}
+          </Indicator>
+        </Flex>
+        <Flex gap="xs">
+          <Text>{budget.toFixed(2)}</Text>
+          <Text color={budget >= avgExpense ? 'green' : 'red'}>(~ {avgExpense.toFixed(2)})</Text>
+        </Flex>
+      </Flex>
+      <Stack align="stretch" gap="xs">
+        <Text>{balance.toFixed(2)}</Text>
+        <BudgetBar budget={budget} balance={balance} warnPercent={15} />
+      </Stack>
+      <TransactionEditor onSubmit={createTransaction} />
     </Card>
   )
 }

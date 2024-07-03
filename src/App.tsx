@@ -1,25 +1,23 @@
 import '@mantine/core/styles.css'
 
-import { AppShell, Burger, Container, Stack } from '@mantine/core'
-import { Button } from '@mantine/core'
+import { AppShell, Box, Burger, Button, Container, Flex, Stack, Text, TextInput } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { ResponsiveContext } from 'grommet'
-import { useCallback, useContext, useEffect } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
 import ActionButton from './components/ActionButton'
+import Accounts from './pages/Accounts'
 import FundDetailPage from './pages/FundDetailPage'
 import { FundsPage } from './pages/FundsPage'
 import StatsPage from './pages/Stats'
 import SyncPage from './pages/SyncPage'
-import { makeMonthIncome, useAppDispatch } from './store'
-import { authorize } from './store/authSlice'
-import { selectIsAuthorized } from './store/authSlice'
-import { fetchFunds } from './store/fundsSlice'
+import { makeMonthIncome, selectAllFunds, selectFundAVGExpense, useAppDispatch } from './store'
+import { authorize, selectIsAuthorized } from './store/authSlice'
+import { createFund, fetchFunds, selectFundsIds } from './store/fundsSlice'
 import { clearLocals } from './store/globalActions'
 import { fetchTransactions, sendTempTransactions } from './store/transactionsSlice'
-import Accounts from './pages/Accounts'
 
 function Menu({ navigate }: { navigate: (path: any) => void }) {
   const location = useLocation().pathname
@@ -57,6 +55,9 @@ function Menu({ navigate }: { navigate: (path: any) => void }) {
         <ActionButton size={size} actionCreator={makeMonthIncome}>
           New Month
         </ActionButton>
+        <Button size={size} onClick={() => navigate('/new-fund')}>
+          Add Fund
+        </Button>
       </Stack>
     </Container>
   )
@@ -83,12 +84,20 @@ export default function App() {
   const navigate_ = useCallback(
     (path: string) => {
       navigate(path)
-      console.log("burger state", opened)
+      console.log('burger state', opened)
       toggle()
     },
     [opened]
   )
-  
+  const overallAVGExpense = useSelector((s) => {
+    const ids = selectFundsIds(s)
+    return ids.map((i) => selectFundAVGExpense(s, i)).reduce((s, a) => s + a, 0)
+  })
+  const overallBudget = useSelector((s) => {
+    return selectAllFunds(s).reduce((s, f) => s + f.budget, 0)
+  })
+  const budgetDiff = overallAVGExpense - overallBudget
+
   return (
     <AppShell
       header={{ height: 60 }}
@@ -100,7 +109,16 @@ export default function App() {
       padding="md"
     >
       <AppShell.Header>
-        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+        <Flex align="center" gap="sm">
+          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+          <Stack gap="0">
+            <Text>Budget: {overallBudget.toFixed(2)}</Text>
+            <Text color="red">
+              AVG expense: {overallAVGExpense.toFixed(2)} ({budgetDiff > 0 ? '+' : '-'}
+              {budgetDiff.toFixed(2)})
+            </Text>
+          </Stack>
+        </Flex>
       </AppShell.Header>
       <AppShell.Navbar>
         <Menu navigate={navigate_} />
@@ -112,8 +130,26 @@ export default function App() {
           <Route path="/sync" element={<SyncPage />} />
           <Route path="/stats" element={<StatsPage />} />
           <Route path="/accounts" element={<Accounts />} />
+          <Route path="/new-fund" element={<NewFund />} />
         </Routes>
       </AppShell.Main>
     </AppShell>
+  )
+}
+
+export function NewFund() {
+  const [name, setName] = useState('')
+  const [budget, setBudget] = useState(0)
+  const dispatch = useAppDispatch()
+
+  const submit = useCallback(() => {
+    dispatch(createFund({ name, budget, initialBalance: 0 }))
+  }, [dispatch, name, budget])
+  return (
+    <Box>
+      <TextInput label="Name" value={name} onChange={(e) => setName(e.target.value)} />
+      <TextInput label="Budget" value={budget} onChange={(e) => setBudget(Number.parseFloat(e.target.value))} />
+      <Button onClick={submit}>Submit</Button>
+    </Box>
   )
 }

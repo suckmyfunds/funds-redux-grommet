@@ -268,8 +268,9 @@ export function transformTransactionFromResponse(vals: string[]): Transaction {
   }
 }
 
-export function fundToRequest(fund: Fund) {
+export function fundToRequest(fund: FundRemote) {
   return [
+    fund.id,
     fund.name,
     floatToExcelString(fund.budget),
     `=B4-SUM(INDIRECT("$A4")&"!$A$2:$A")`,
