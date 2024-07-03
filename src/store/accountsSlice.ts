@@ -1,28 +1,23 @@
 import { createAsyncThunk, createEntityAdapter, createSlice, nanoid } from '@reduxjs/toolkit'
 
+import API, { transformAccountFromResponse, transformAccountToResponse } from '../api'
 import { Account, AccountRemote } from '../types'
 import { selectToken } from './authSlice'
 import { RootState } from './index'
-import API, { transformAccountFromResponse, transformAccountToResponse } from '../api'
 
+export const getAccounts = createAsyncThunk('accounts/fetchAll', async (_, { getState }): Promise<AccountRemote[]> => {
+  const rootState = getState() as RootState
+  const token = selectToken(rootState)
+  let api = new API(token)
 
-export const getAccounts = createAsyncThunk('accounts/fetchAll',
-  async (_, { getState }): Promise<AccountRemote[]> => {
-    const rootState = getState() as RootState
-    const token = selectToken(rootState)
-    let api = new API(token)
+  return (await api.getRows('accounts!A2:F')).map((a, idx) => ({
+    ...transformAccountFromResponse(a),
+    id: `${idx + 1}`,
+  }))
+})
 
-    return (await api.getRows('accounts!A2:F')).map((a, idx) => ({
-      ...transformAccountFromResponse(a),
-      id: `${idx+1}`
-    }))
-  })
-
-export const createAccount = createAsyncThunk<
-  AccountRemote,
-  Account,
-  { rejectValue: { id: string, error: Error } }
->('accounts/create',
+export const createAccount = createAsyncThunk<AccountRemote, Account, { rejectValue: { id: string; error: Error } }>(
+  'accounts/create',
   async (payload: Account, { getState, dispatch, rejectWithValue }) => {
     const rootState = getState() as RootState
     const token = selectToken(rootState)
@@ -36,11 +31,12 @@ export const createAccount = createAsyncThunk<
     } catch (e) {
       return rejectWithValue({
         id: result.id,
-        error: e as Error
+        error: e as Error,
       })
     }
     return { ...result }
-  })
+  }
+)
 
 const adapter = createEntityAdapter({ selectId: (acc: AccountRemote) => acc.id })
 
@@ -65,10 +61,10 @@ const slice = createSlice({
         if (action.payload) {
           adapter.updateOne(s, { id: action.payload.id, changes: { ...s.entities[s.ids[0]] } })
         } else {
-          console.error("createAccount.rejected have no payload, so temporal account not removed", action.error)
+          console.error('createAccount.rejected have no payload, so temporal account not removed', action.error)
         }
       })
-  }
+  },
 })
 
 export const selectors = adapter.getSelectors((s: RootState) => s.accounts)

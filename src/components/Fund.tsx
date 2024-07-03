@@ -1,4 +1,4 @@
-import { Box, Card, Chip, Flex, Group, Indicator, Stack, Text } from '@mantine/core'
+import { Card, Flex, Group, Stack, Text } from '@mantine/core'
 import React, { useCallback } from 'react'
 import { useSelector } from 'react-redux'
 
@@ -10,7 +10,7 @@ import BudgetBar from './BudgetBar'
 import TransactionEditor from './TransactionEditor'
 
 export default function Fund({ fundId, onClick }: { fundId: string; onClick?: () => void }) {
-  const { name, budget, balance, synced } = useSelector((s) => selectFund(s, fundId))
+  const { name, budget, balance } = useSelector((s) => selectFund(s, fundId))
   const handleOnClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation()
@@ -44,8 +44,8 @@ export default function Fund({ fundId, onClick }: { fundId: string; onClick?: ()
         <Flex justify="space-between">
           <Flex onClick={handleOnClick}>
             {/* <Indicator color="red" disabled={synced} zIndex={10} size='7'> */}
-              <Text>{name}</Text>
-              {/* <Text>initial: {initialBalance?.toFixed(2)}</Text> */}
+            <Text>{name}</Text>
+            {/* <Text>initial: {initialBalance?.toFixed(2)}</Text> */}
             {/* </Indicator> */}
           </Flex>
           <Group gap="xs">

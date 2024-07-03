@@ -15,12 +15,12 @@ import storage from 'reduxjs-toolkit-persist/lib/storage'
 import GoogleSpreadsheetAPI, { transactionToRequestObject } from '../api'
 import { Transaction, TransactionRemote } from '../types'
 import { dateToExcelFormat } from '../utils'
+import { accountsSlice } from './accountsSlice'
 import { authSlice } from './authSlice'
 import { fundsSlice } from './fundsSlice'
 import { selectAllFunds } from './selectors'
 import { tempSlice } from './temp'
 import { transactionsSlice } from './transactionsSlice'
-import { accountsSlice } from './accountsSlice'
 export * from './selectors'
 
 const expireConfig = {
@@ -78,7 +78,7 @@ export const makeMonthIncome = createAsyncThunk(
       description: 'На месяц',
       synced: true,
       type: 'INCOME',
-      fromAccount: 'input'
+      fromAccount: 'input',
     }
     const state: RootState = getState()
 
@@ -91,7 +91,7 @@ export const makeMonthIncome = createAsyncThunk(
       id: nanoid(),
       amount: -(t.amount !== 0 ? t.amount : budget),
       fundId: id,
-      fromAccount: 'input'
+      fromAccount: 'input',
     }))
 
     dispatch(transactionsSlice.actions.addMany(transactionsToCreate))

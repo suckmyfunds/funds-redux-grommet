@@ -1,5 +1,5 @@
-import { Button, Group, TextInput } from '@mantine/core';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { Button, Group, TextInput } from '@mantine/core'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 const floatRegExp = new RegExp('^-?[0-9]*([0-9]{1}[.,][0-9]{0,2})?$')
 
@@ -52,7 +52,7 @@ export default function TransactionEditor({
   }
 
   return (
-    <Group wrap="nowrap" gap='xs' onKeyUp={onClick} onClick={onClick}>
+    <Group wrap="nowrap" gap="xs" onKeyUp={onClick} onClick={onClick}>
       <TextInput
         ref={inputRefFocus}
         type="text"

@@ -12,9 +12,8 @@ import type {
   SpreadSheet,
   Transaction,
   UpdateResponse,
-  ValuesRange
+  ValuesRange,
 } from './types'
-
 import { floatToExcelString } from './utils'
 
 const SHEET_ID = '16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ'
@@ -290,7 +289,6 @@ export function fundToRequestObject(fund: Fund): RowData {
 }
 
 export function transactionToRequest(transaction: Transaction) {
-
   return [
     floatToExcelString(transaction.amount),
     transaction.date,
@@ -371,8 +369,5 @@ export function transformAccountFromResponse(account: string[]): Account {
 }
 
 export function transformAccountToResponse(account: Account): string[] {
-  return [
-    account.name,
-    floatToExcelString(account.initialBalance),
-  ]
+  return [account.name, floatToExcelString(account.initialBalance)]
 }

@@ -31,7 +31,6 @@ export const selectTransactionsForAccountSync = createSelector(
 export const selectFundTransactions = createSelector(
   [selectAllTransactions, (_, fundId: string) => fundId],
   (transactions, fundId) => {
-
     return transactions.filter((t) => t.fundId === fundId).reverse()
   }
 )
@@ -55,11 +54,12 @@ export const getTransactionsAVG = (transactions: TransactionRemote[]): number =>
   if (Object.keys(sums).length == 0) {
     return 0
   }
-  return (Object.values(sums).reduce((a, b) => a + b, 0)) / Object.keys(sums).length
+  return Object.values(sums).reduce((a, b) => a + b, 0) / Object.keys(sums).length
 }
 
 export const getFundChartData = (transactions: TransactionRemote[], treshhold: number = 0, fund: Fund) => {
-  const onlyExpenses = (t: TransactionRemote) => t.amount > 0 && t.amount <= (treshhold == 0 ? Number.MAX_VALUE : treshhold)
+  const onlyExpenses = (t: TransactionRemote) =>
+    t.amount > 0 && t.amount <= (treshhold == 0 ? Number.MAX_VALUE : treshhold)
   const groups = groupBy(transactions, (t) => {
     const date = dateFromExcelFormat(t.date)
     return `${date.getMonth() + 1}.${date.getFullYear() - 2000}`
@@ -69,7 +69,7 @@ export const getFundChartData = (transactions: TransactionRemote[], treshhold: n
   const avgWindowSize = 4
 
   const sums = getTransactionExpencesByMonth(transactions)
-  const avg = (Object.values(sums).reduce((a, b) => a + b, 0)) / Object.keys(sums).length
+  const avg = Object.values(sums).reduce((a, b) => a + b, 0) / Object.keys(sums).length
   const medianValue = median(Object.values(sums))
   return {
     transactions: Object.keys(groups).map((month) => {
@@ -89,9 +89,8 @@ export const getFundChartData = (transactions: TransactionRemote[], treshhold: n
   }
 }
 
-export const selectFundAVGExpense = createSelector(
-  [selectFundTransactions],
-  (transactions) => getTransactionsAVG(transactions)
+export const selectFundAVGExpense = createSelector([selectFundTransactions], (transactions) =>
+  getTransactionsAVG(transactions)
 )
 
 export const selectTransactionsOnDate = createSelector(

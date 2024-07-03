@@ -1,6 +1,6 @@
 import '@mantine/core/styles.css'
 
-import { AppShell, Box, Burger, Button, Container, Flex, Stack, Text, TextInput } from '@mantine/core'
+import { AppShell, Box, Burger, Button, Flex, Stack, Text, TextInput } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { ResponsiveContext } from 'grommet'
 import { useCallback, useContext, useEffect, useState } from 'react'
@@ -106,7 +106,7 @@ export default function App() {
       }}
       padding="md"
     >
-      <AppShell.Header p='sm'>
+      <AppShell.Header p="sm">
         <Flex align="center" gap="sm">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Stack gap="0">
@@ -118,7 +118,7 @@ export default function App() {
           </Stack>
         </Flex>
       </AppShell.Header>
-      <AppShell.Navbar p='sm'>
+      <AppShell.Navbar p="sm">
         <Menu navigate={navigate_} />
       </AppShell.Navbar>
       <AppShell.Main>

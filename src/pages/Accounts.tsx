@@ -1,6 +1,7 @@
-import { Box, Button, TextInput, Text, Card, Flex, Stack } from '@mantine/core'
+import { Box, Button, Card, Flex, Stack, Text, TextInput } from '@mantine/core'
 import { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+
 import { useAppDispatch } from '../store'
 import { createAccount, getAccounts, selectors } from '../store/accountsSlice'
 import { selectIsAuthorized } from '../store/authSlice'
@@ -23,9 +24,7 @@ export default function Accounts() {
 
   return (
     <Stack gap={'sm'}>
-      {accounts && accounts.map((a) => (
-        <Account key={a.id} account={a} />
-      ))}
+      {accounts && accounts.map((a) => <Account key={a.id} account={a} />)}
       {accounts.length == 0 && <div>No accounts found</div>}
       <Box>
         <TextInput label="Account name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -48,7 +47,7 @@ function Account({ account }: { account: AccountRemote }) {
     <Card>
       <Card.Section>
         <Flex gap={'xs'} align={'center'}>
-            <Text>{account.name}</Text> <Text>{account.initialBalance}</Text>
+          <Text>{account.name}</Text> <Text>{account.initialBalance}</Text>
         </Flex>
       </Card.Section>
     </Card>

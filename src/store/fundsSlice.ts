@@ -1,7 +1,7 @@
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
 
-import API, { fundToRequest, fundToRequestObject, transformFundFromResponse } from '../api'
-import type { AddSheetResponse, Fund, FundRemote } from '../types'
+import API, { fundToRequest, transformFundFromResponse } from '../api'
+import type { Fund, FundRemote } from '../types'
 import { selectToken } from './authSlice'
 import { clearLocals } from './globalActions'
 import { RootState } from './index'
@@ -24,13 +24,13 @@ export const fetchFunds = createAsyncThunk('funds/fetchAll', async (_, { getStat
 //     return { ...fund, id };
 // });
 
-export const createFund = createAsyncThunk("funds/create", async (fund: Fund, { getState }) => {
-  const token = (getState() as RootState).auth.token;
-  let api = new API(token);
+export const createFund = createAsyncThunk('funds/create', async (fund: Fund, { getState }) => {
+  const token = (getState() as RootState).auth.token
+  let api = new API(token)
   let res = await api.createSheet(fund.name)
   const id = String(res.addSheet.properties.sheetId)
-  await api.appendRow('funds', fundToRequest({...fund, id} ))
-  return { ...fund, id };
+  await api.appendRow('funds', fundToRequest({ ...fund, id }))
+  return { ...fund, id }
 })
 
 const adapter = createEntityAdapter({
