@@ -1,4 +1,4 @@
-import { Box, Button, Card, Flex, Stack, Text, TextInput } from '@mantine/core'
+import { Box, Button, Card, Flex, Group, Stack, Text, TextInput } from '@mantine/core'
 import { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
@@ -44,12 +44,13 @@ export default function Accounts() {
 
 function Account({ account }: { account: AccountRemote }) {
   return (
-    <Card>
-      <Card.Section>
-        <Flex gap={'xs'} align={'center'}>
-          <Text>{account.name}</Text> <Text>{account.initialBalance}</Text>
-        </Flex>
-      </Card.Section>
+    <Card withBorder radius="xs">
+      <Flex gap="sm">
+        <Group>
+          <Text>{account.name}</Text>
+          <Text>{account.initialBalance}</Text>
+        </Group>
+      </Flex>
     </Card>
   )
 }

@@ -15,7 +15,7 @@ import StatsPage from './pages/Stats'
 import SyncPage from './pages/SyncPage'
 import { makeMonthIncome, selectAllFunds, selectFundAVGExpense, useAppDispatch } from './store'
 import { authorize, selectIsAuthorized } from './store/authSlice'
-import { createFund, fetchFunds, selectFundsIds } from './store/fundsSlice'
+import { createFund, fetchFunds, selectFundById, selectFundsIds } from './store/fundsSlice'
 import { clearLocals } from './store/globalActions'
 import { fetchTransactions, sendTempTransactions } from './store/transactionsSlice'
 
@@ -89,7 +89,12 @@ export default function App() {
   )
   const overallAVGExpense = useSelector((s) => {
     const ids = selectFundsIds(s)
-    return ids.map((i) => selectFundAVGExpense(s, i)).reduce((s, a) => s + a, 0)
+    const res =  ids.map((i) => {
+      let avg = selectFundAVGExpense(s, i)
+      if (avg == 0) return selectFundById(s, i).budget
+      return avg
+    }).reduce((s, a) => s + a, 0)
+    return res
   })
   const overallBudget = useSelector((s) => {
     return selectAllFunds(s).reduce((s, f) => s + f.budget, 0)
@@ -111,9 +116,8 @@ export default function App() {
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Stack gap="0">
             <Text>Budget: {overallBudget.toFixed(2)}</Text>
-            <Text color="red">
-              AVG expense: {overallAVGExpense.toFixed(2)} ({budgetDiff > 0 ? '+' : '-'}
-              {budgetDiff.toFixed(2)})
+            <Text color={budgetDiff > 0 ? 'red' : 'green'}>
+              AVG expense: {overallAVGExpense.toFixed(2)} ({budgetDiff.toFixed(2)})
             </Text>
           </Stack>
         </Flex>

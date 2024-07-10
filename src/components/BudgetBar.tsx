@@ -27,16 +27,16 @@ export default function BudgetBar({
   let color = 'blue'
   let percent = 0
   let overflowPercent = 0
-  console.group(`progressBar budget: ${budget}, balance: ${balance} warnPercent ${warnPercent}`)
+  // console.group(`progressBar budget: ${budget}, balance: ${balance} warnPercent ${warnPercent}`)
   if (balance > 0) {
     percent = (balance / budget) * 100
-    console.log('percent', percent)
+    // console.log('percent', percent)
     if (percent <= warnPercent) {
       color = 'yellow'
     } else if (percent > 100) {
       percent = (budget / balance) * 100
       overflowPercent = 100 - percent
-      console.log('overflow', overflowPercent)
+      // console.log('overflow', overflowPercent)
     }
   } else if (balance == 0) {
     percent = 100
@@ -45,7 +45,7 @@ export default function BudgetBar({
     percent = 100
     color = 'red'
   }
-  console.groupEnd()
+  // console.groupEnd()
   return (
     <Progress.Root size="xl">
       <Tooltip label={percent.toFixed(2) + '%'}>
