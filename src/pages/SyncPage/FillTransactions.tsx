@@ -179,7 +179,7 @@ function Calendar() {
       >
         Today
       </Button>
-      <Calendar_ date={dateFromExcelFormat(date).toISOString()} onSelect={onSelectDate}>
+      <Calendar_ date={dateFromExcelFormat(date).toISOString()} onSelect={onSelectDate} style={{ width: '100%' }}>
         {(props: any) => (
           <CalendarDayBox
             key={dateToExcelFormat(props.date)}

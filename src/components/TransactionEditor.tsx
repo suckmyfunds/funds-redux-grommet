@@ -1,4 +1,4 @@
-import { Button, Group, TextInput } from '@mantine/core'
+import { Button, Group, TextInput, NumberInput } from '@mantine/core'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 const floatRegExp = new RegExp('^-?[0-9]*([0-9]{1}[.,][0-9]{0,2})?$')
@@ -46,6 +46,7 @@ export default function TransactionEditor({
 
   function onChangeAmount(e: React.ChangeEvent<HTMLInputElement>) {
     const { value } = e.target
+    console.log("amount", value)
     if (floatRegExp.test(value)) {
       setAmount(value.startsWith('0') ? value.slice(1) : value)
     }
@@ -54,8 +55,10 @@ export default function TransactionEditor({
   return (
     <Group wrap="nowrap" gap="xs" onKeyUp={onClick} onClick={onClick}>
       <TextInput
+        type="number"
+        inputMode="decimal"
+        pattern='[0-9]*.?[0-9]*'
         ref={inputRefFocus}
-        type="text"
         placeholder="amount"
         name="amount"
         value={amount}
