@@ -1,15 +1,12 @@
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
 
-import API, { fundToRequest, transformFundFromResponse } from '../api'
+import { fundToRequest, transformFundFromResponse } from '../api'
 import type { Fund, FundRemote } from '../types'
-import { selectToken } from './authSlice'
 import { clearLocals } from './globalActions'
-import { RootState } from './index'
+import { RootState, getAPIFromStore } from './index'
 
 export const fetchFunds = createAsyncThunk('funds/fetchAll', async (_, { getState }): Promise<FundRemote[]> => {
-  const rootState = getState() as RootState
-  const token = selectToken(rootState)
-  let api = new API(token)
+  const api = getAPIFromStore(getState)
   return (await api.getRows('funds!A2:F')).map((f) => ({
     ...transformFundFromResponse(f),
     status: 'idle',
@@ -25,8 +22,7 @@ export const fetchFunds = createAsyncThunk('funds/fetchAll', async (_, { getStat
 // });
 
 export const createFund = createAsyncThunk('funds/create', async (fund: Fund, { getState }) => {
-  const token = (getState() as RootState).auth.token
-  let api = new API(token)
+  const api = getAPIFromStore(getState)
   let res = await api.createSheet(fund.name)
   const id = String(res.addSheet.properties.sheetId)
   await api.appendRow('funds', fundToRequest({ ...fund, id }))

@@ -3,12 +3,10 @@ import { createAsyncThunk, createEntityAdapter, createSlice, nanoid } from '@red
 import API, { transformAccountFromResponse, transformAccountToResponse } from '../api'
 import { Account, AccountRemote } from '../types'
 import { selectToken } from './authSlice'
-import { RootState } from './index'
+import { RootState, getAPIFromStore } from './index'
 
 export const getAccounts = createAsyncThunk('accounts/fetchAll', async (_, { getState }): Promise<AccountRemote[]> => {
-  const rootState = getState() as RootState
-  const token = selectToken(rootState)
-  let api = new API(token)
+  const api = getAPIFromStore(getState)
 
   return (await api.getRows('accounts!A2:F')).map((a, idx) => ({
     ...transformAccountFromResponse(a),
@@ -19,10 +17,7 @@ export const getAccounts = createAsyncThunk('accounts/fetchAll', async (_, { get
 export const createAccount = createAsyncThunk<AccountRemote, Account, { rejectValue: { id: string; error: Error } }>(
   'accounts/create',
   async (payload: Account, { getState, dispatch, rejectWithValue }) => {
-    const rootState = getState() as RootState
-    const token = selectToken(rootState)
-    let api = new API(token)
-
+    const api = getAPIFromStore(getState)
     const result: AccountRemote = { ...payload, id: nanoid() }
 
     dispatch(slice.actions.add(result))

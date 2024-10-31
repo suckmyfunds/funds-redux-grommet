@@ -12,11 +12,11 @@ import {
 } from 'reduxjs-toolkit-persist'
 import storage from 'reduxjs-toolkit-persist/lib/storage'
 
-import GoogleSpreadsheetAPI, { transactionToRequestObject } from '../api'
+import GoogleSpreadsheetAPI, { API, transactionToRequestObject } from '../api'
 import { Transaction, TransactionRemote } from '../types'
 import { dateToExcelFormat } from '../utils'
 import { accountsSlice } from './accountsSlice'
-import { authSlice } from './authSlice'
+import { authSlice, selectToken } from './authSlice'
 import { fundsSlice } from './fundsSlice'
 import { selectAllFunds } from './selectors'
 import { tempSlice } from './temp'
@@ -138,3 +138,10 @@ export type AppDispatch = typeof store.dispatch
 export const useAppDispatch: () => AppDispatch = useDispatch
 
 export { authorize } from './authSlice'
+
+export function getAPIFromStore(getState: ()=> RootState): API {
+  const rootState = getState() as RootState
+  const token = selectToken(rootState)
+  let api = new GoogleSpreadsheetAPI(token)
+  return api
+}

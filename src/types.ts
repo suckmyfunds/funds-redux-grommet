@@ -8,6 +8,7 @@ export interface Entity {
   syncDate?: string
 }
 
+
 export interface Notification {
   type: string
   message: string
@@ -185,10 +186,12 @@ export interface PlannedExpense {
 
 export type PlannedExpenseRemote = PlannedExpense & Entity
 
+
 export interface Account {
   name: string
   initialBalance: number
 }
+
 
 export type AccountRemote = Account & Entity
 export type AccountComputed = AccountRemote & { balance: number }
