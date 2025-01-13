@@ -20,6 +20,7 @@ import { authSlice, selectToken } from './authSlice'
 import { fundsSlice } from './fundsSlice'
 import { selectAllFunds } from './selectors'
 import { tempSlice } from './temp'
+import { slice as wanstSlice } from '../modules/planner/index'
 import { transactionsSlice } from './transactionsSlice'
 export * from './selectors'
 
@@ -37,6 +38,7 @@ const combinedReducer = combineReducers({
   [transactionsSlice.reducerPath]: transactionsSlice.reducer,
   [tempSlice.reducerPath]: tempSlice.reducer,
   [accountsSlice.reducerPath]: accountsSlice.reducer,
+  [wanstSlice.reducerPath]: wanstSlice.reducer,
 })
 
 export const initialState = {
@@ -44,6 +46,7 @@ export const initialState = {
   [fundsSlice.reducerPath]: fundsSlice.initialState,
   [transactionsSlice.reducerPath]: transactionsSlice.initialState,
   [accountsSlice.reducerPath]: accountsSlice.initialState,
+  [wanstSlice.reducerPath]: wanstSlice.initialState,
 }
 
 const persistReducer_ = persistReducer(
@@ -71,9 +74,9 @@ const persistReducer_ = persistReducer(
 // return ids of transtactions that was created
 export const makeMonthIncome = createAsyncThunk(
   'transactions/makeMonthIncome',
-  async (payload: { date: string; amount?: number } | undefined, { getState, dispatch }): Promise<string[]> => {
+  async (payload: { amount?: number } | undefined, { getState, dispatch }): Promise<string[]> => {
     const t: Transaction = {
-      date: payload?.date || dateToExcelFormat(new Date()),
+      date:  dateToExcelFormat(new Date()),
       amount: payload?.amount || 0,
       description: 'На месяц',
       synced: true,

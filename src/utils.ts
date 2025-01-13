@@ -86,10 +86,26 @@ export function compareDates(a: Date, b: Date) {
   return a.getDate() - b.getDate()
 }
 
+
 export function floatToExcelString(float: number) {
   return float.toString().replace('.', ',')
 }
 
 export function floatFromExcelString(str: string) {
   return parseFloat(str.replace(',', '.'))
+}
+
+/**
+ * Convert date to string in format MM.YYYY
+ * @param d date to be converted
+ * @returns 
+ */
+export const dayMY = (d: Date) => `${(d).getMonth()}.${d.getFullYear()}`
+
+
+export function makeScaler(topBound: number, bottomBound: number, gridScale: number) {
+    return (value: number) => {
+        const valuesSize = topBound - bottomBound
+        return (value - bottomBound) / valuesSize * gridScale
+    }
 }

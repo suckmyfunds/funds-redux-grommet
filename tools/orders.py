@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 import re
+from base import price_parse, select_alt
 
-rgx = re.compile("(\d+)\sшт\sпо\s(\d+)")
+
+rgx = re.compile("(\d+)\s?x\s?(\d+)\s?₽")
 
 class ParseException(Exception):
     def __init__(self, msg):
@@ -10,6 +12,26 @@ class ParseException(Exception):
     def __str__(self):
         return f"ParseError: {self.msg}"
 
+
+@dataclass
+class OrderItem:
+    id: str
+    count: int
+    price: float
+    text: str
+
+
+@dataclass
+class Order:
+    date: str
+    id: str
+    products: list[OrderItem]
+    state: str
+    total_price: float
+
+    @property
+    def total_price_check(self):
+        return self.total_price == sum([p.price for p in self.products])
 
 
 @dataclass
@@ -21,40 +43,61 @@ class Selectors:
     price: str
     count: str
     order_date: str
-    order_name: str
     order_price: str
 
 
-
-
 select = Selectors(
-        **{"ship":".sf1_14",
-           "ship_state":".ue_14",
-           "product":".q9f_14",
-           "price":".d7014-a2",
-           "count":".tsBodyControl500Medium",
-           "product_name":".rf5_14",
-           "order_name":".tsHeadline700XLarge",
-           "order_date":".tsBody400Small",
-           "order_price":".f6z_14"}
+    **{
+        "ship": ".ng0_14",
+        "ship_state": ".tsHeadline550Medium",
+        "product": ".m5g_14",
+        "price": ".c3022-a1",
+        "count": ".c3022-b2",
+        "product_name": ".g7m_14.m7g_14",
+        "order_date": ".x2.g4o_14",
+        "order_price": ".f0y_14 > div:nth-child(2) .yf_14",
+    }
 )
 
-def safe_text(soup, selector, context):
-    try:
-        return soup.select_one(selector).text.strip()
-    except AttributeError:
-        print(f"error when try to parse {selector} in {context}")
-        return None
+ZAKAZ_OT = "Заказ от"
 
-def parse(soup, printer):
+month_num = {
+        "января": "01",
+        "февраля": "02",
+        "марта": "03",
+        "апреля": "04",
+        "мая": "05",
+        "июня": "06",
+        "июля": "07",
+        "августа": "08",
+        "сентября": "09",
+        "октября": "10",
+        "ноября": "11",
+        "декабря": "12",
+        }
+
+
+def parse(soup, printer, order_name):
+    try:
+        order_date = select_alt(soup, select.order_date).text.strip()
+    except Exception as e:
+        raise ParseException(f"can't parse order_date {select.order_date}: '{e}'")
+
     results = {}
-    order_name = safe_text(soup, select.order_name, "order_name")
-    order_date = safe_text(soup, select.order_date, "orded_date")
+
+
+    if ZAKAZ_OT in order_date:
+        order_date = order_date[len(ZAKAZ_OT):].strip()
+        day_number, month = order_date.split()
+        order_date = f"{day_number.strip()}.{month_num[month.strip()]}.2024"
     ships = soup.select(select.ship)
+    if ships is None or len(ships) == 0:
+        ParseException(f"No any ship found with {select.ship}")
+
     printer(f"got ships {len(ships)}")
     for idx, ship in enumerate(ships):
         # local delivery
-        try: 
+        try:
             if ship.select_one(select.ship_state):
                 state = ship.select_one(select.ship_state).text.strip()
             # foreign delivery
@@ -62,7 +105,6 @@ def parse(soup, printer):
                 state = "Foregn"
         except Expection as e:
             raise ParseException(f"ship: {idx}: {e}")
-
 
         products = ship.select(select.product)
         printer(f"ship {state=} in {order_name=} have {len(products)} products")
@@ -74,16 +116,19 @@ def parse(soup, printer):
             except AttributeError:
                 print(f"error when try to parse {select.product_name} in {product}")
 
-            link = product.select_one(select.product_name).attrs["href"]
-            total_price = product.select_one(select.price).text.replace("\xa0", "").replace(',',".")
+            link = text.strip() # product.select_one(select.product_name).attrs["href"]
+            price = price_parse(product.select_one(select.price).text)
             count = 1
-            price = float(total_price.split()[0])
 
             count_el = product.select_one(select.count)
             if count_el:
-                if m := rgx.match(count_el.text.replace("\xa0", "")):
+                t = count_el.text.replace("\xa0", "")
+                if m := rgx.match(t):
                     count = int(m.groups()[0])
                     price = int(m.groups()[1])
+                else:
+                    raise ParseException(f"count regexp not match with: {t}")
+                        
             if results.get(link):
                 c = results[link]["count"]
                 results[link]["count"] = c + count
@@ -93,10 +138,10 @@ def parse(soup, printer):
                     total_price=price,
                     text=text,
                     count=count,
-                    price=price,
+                    amount=price,
                     state=state,
                     order_date=order_date,
-                    order_name=order_name,
+                    order_id=order_name,
                 )
 
     return results

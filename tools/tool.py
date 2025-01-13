@@ -7,8 +7,7 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import FuzzyWordCompleter
 
 from base import cli
-from pull import orders, refunds
-from parse import parse_orders, parse_refunds
+from parse import parse
 
 
 def fill_categories():
