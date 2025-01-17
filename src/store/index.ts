@@ -89,13 +89,13 @@ export const makeMonthIncome = createAsyncThunk(
     console.log('TRACE', funds)
     const token = state.auth.token
 
-    const transactionsToCreate: TransactionRemote[] = funds.map(({ id, budget }) => ({
+    const transactionsToCreate: TransactionRemote[] = [funds.map(({ id, budget }) => ({
       ...t,
       id: nanoid(),
       amount: -(t.amount !== 0 ? t.amount : budget),
       fundId: id,
       fromAccount: 'input',
-    }))
+    }))[0]]
 
     dispatch(transactionsSlice.actions.addMany(transactionsToCreate))
 
@@ -103,7 +103,7 @@ export const makeMonthIncome = createAsyncThunk(
     await api.batchUpdate(
       transactionsToCreate.map((t) => ({
         appendCells: {
-          fields: '*',
+          fields: 'userEnteredValue',
           sheetId: Number.parseInt(t.fundId),
           rows: [transactionToRequestObject(t)],
         },

@@ -1,4 +1,3 @@
-import React, { useCallback } from 'react'
 import { dateFromExcelFormat, dayMY as dayAsMonthYear, makeScaler } from '../utils'
 import { TransactionRemote } from '../types'
 import { makeOnlyExpensesWithTreshhold } from '../bl/utils'

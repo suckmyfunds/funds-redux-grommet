@@ -1,8 +1,7 @@
 import { createAsyncThunk, createEntityAdapter, createSlice, nanoid } from '@reduxjs/toolkit'
 
-import API, { transformAccountFromResponse, transformAccountToResponse } from '../api'
+import { transformAccountFromResponse, transformAccountToResponse } from '../api'
 import { Account, AccountRemote } from '../types'
-import { selectToken } from './authSlice'
 import { RootState, getAPIFromStore } from './index'
 
 export const getAccounts = createAsyncThunk('accounts/fetchAll', async (_, { getState }): Promise<AccountRemote[]> => {

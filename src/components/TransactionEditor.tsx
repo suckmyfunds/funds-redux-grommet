@@ -1,4 +1,4 @@
-import { Button, Group, TextInput, NumberInput } from '@mantine/core'
+import { Button, Group, TextInput } from '@mantine/core'
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 const floatRegExp = new RegExp('^-?[0-9]*([0-9]{1}[.,][0-9]{0,2})?$')

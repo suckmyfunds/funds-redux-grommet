@@ -1,9 +1,9 @@
-import {createEntityAdapter, createSelector, createSlice} from "@reduxjs/toolkit"
-import React, {useState} from "react"
-import {RootState, initialState} from "../../store"
-import {dateFromExcelFormat, dateToExcelFormat} from "../../utils"
+import {createEntityAdapter, createSlice} from "@reduxjs/toolkit"
+import {useState} from "react"
+import {RootState} from "../../store"
+import {dateToExcelFormat} from "../../utils"
 import {useDispatch, useSelector} from "react-redux"
-import {ActionIcon, Button, Card, Chip, Flex, Group, NumberInput, Stack, Text, TextInput} from "@mantine/core"
+import {ActionIcon, Button, Card, Chip, Group, NumberInput, Stack, Text, TextInput} from "@mantine/core"
 /*
 Plan expenses. 
 - Set up a wanted thing name, price and date.
@@ -51,7 +51,7 @@ export function WantsPlan() {
       <Stack>
         <Group>
           <Chip>{w.name}</Chip><Text>{w.price}</Text>
-          <ActionIcon onClick={e => dispatch(slice.actions.remove(w.name))}>x</ActionIcon>
+          <ActionIcon onClick={() => dispatch(slice.actions.remove(w.name))}>x</ActionIcon>
         </Group>
         <Text>{w.dueDate}</Text>
       </Stack>

@@ -14,7 +14,7 @@ import type {
   UpdateResponse,
   ValuesRange,
 } from './types'
-import { floatToExcelString } from './utils'
+import { dateFromExcelFormat, floatToExcelString } from './utils'
 
 const SHEET_ID = '16Q3kcikjtI2YiN-JwpZoRoHPxPuoOgaiCppt0ZcwgiQ'
 
