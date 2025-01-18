@@ -48,7 +48,7 @@ export default function Fund({fundId, onClick}: {fundId: string; onClick?: () =>
                     </Group>
                 </Flex>
                 <BudgetBar budget={budget} balance={balance > 0 ? balance : budget - lastMonthExpensed} warnPercent={15} />
-                {/*<TransactionEditor onSubmit={createTransaction} />*/}
+                <TransactionEditor onSubmit={createTransaction} />
             </Stack>
         </Card>
     )
