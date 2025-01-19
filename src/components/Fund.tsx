@@ -3,7 +3,7 @@ import React, {useCallback} from 'react'
 import {useSelector} from 'react-redux'
 
 import {useAppDispatch} from '../store'
-import {selectFund, selectFundAVGExpense} from '../store/selectors'
+import {selectFund} from '../store/selectors'
 import {addTransactionToFund} from '../store/transactionsSlice'
 import {dateToExcelFormat} from '../utils'
 import BudgetBar from './BudgetBar'
@@ -19,7 +19,6 @@ export default function Fund({fundId, onClick}: {fundId: string; onClick?: () =>
         },
         [onClick]
     )
-    const avgExpense = useSelector((s) => selectFundAVGExpense(s, fundId))
 
     const dispatch = useAppDispatch()
     const createTransaction = useCallback(

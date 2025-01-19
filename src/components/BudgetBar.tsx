@@ -1,4 +1,4 @@
-import {Progress, Tooltip} from '@mantine/core'
+import {Progress} from '@mantine/core'
 
 /**
  * Will render progress bar with special color based on budget and balance.
@@ -47,7 +47,7 @@ export default function BudgetBar({
         color = 'red'
     }
     if (percent < 20) {
-        color = "red"
+        color = "orange"
         percent = 20
     }
     // console.groupEnd()
