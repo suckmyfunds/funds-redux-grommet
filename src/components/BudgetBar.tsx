@@ -14,7 +14,7 @@ export default function BudgetBar({
 }: {
     balance: number
     budget: number
-    warnPercent: number
+    warnPercent?: number
 }) {
     // Calculate percentagre of balance agains the budget
     // If balance is 0 -
@@ -31,13 +31,15 @@ export default function BudgetBar({
     if (balance > 0) {
         percent = (balance / budget) * 100
         // console.log('percent', percent)
-        if (percent <= warnPercent) {
-            color = 'yellow'
-        } else if (percent > 100) {
-            // percent = (budget / balance) * 100
-            // overflowPercent = 100 - percent
-            // console.log('overflow', overflowPercent)
-            percent = 100
+        if (warnPercent) {
+            if (percent <= warnPercent) {
+                color = 'yellow'
+            } else if (percent > 100) {
+                // percent = (budget / balance) * 100
+                // overflowPercent = 100 - percent
+                // console.log('overflow', overflowPercent)
+                percent = 100
+            }
         }
     } else if (balance == 0) {
         percent = 100
@@ -48,14 +50,18 @@ export default function BudgetBar({
     }
     if (percent < 20) {
         color = "orange"
-        percent = 20
     }
     // console.groupEnd()
     return (
         <Progress.Root size="20" autoContrast >
             <Progress.Section value={percent} color={color}>
-            <Progress.Label >{balance.toFixed(2)}</Progress.Label>
+                {percent > 20 && <Progress.Label >{balance.toFixed(2)}</Progress.Label>}
             </Progress.Section>
+            {percent <= 20 &&
+                <Progress.Section value={100 - percent} color="var(--mantine-color-gray-2)">
+                    <Progress.Label c={color}>{balance.toFixed(2)}</Progress.Label>
+                </Progress.Section>
+            }
         </Progress.Root>
     )
 }

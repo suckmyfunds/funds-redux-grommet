@@ -3,6 +3,7 @@ export class LogTypes {
   static SYSTEM = 'system'
   static ERROR = 'error'
 }
+
 export interface Entity {
   id: string
   syncDate?: string
@@ -19,6 +20,7 @@ export interface Fund {
   name: string
   budget: number
   initialBalance: number
+  isAccum: boolean
 }
 export type FundCreate = Omit<Fund, 'needSync'>
 

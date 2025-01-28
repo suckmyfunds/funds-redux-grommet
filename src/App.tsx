@@ -19,6 +19,7 @@ import {createFund, fetchFunds} from './store/fundsSlice'
 import {clearLocals} from './store/globalActions'
 import {fetchTransactions, sendTempTransactions} from './store/transactionsSlice'
 import {WantsPage} from './pages/Wants'
+import BudgetBar from './components/BudgetBar'
 
 function Menu({navigate}: {navigate: (path: any) => void}) {
     const location = useLocation().pathname
@@ -116,11 +117,7 @@ export default function App() {
                                 <Text>Budget: {overallBudget.toFixed(2)}</Text>
                                 <Text>This month: {overallMonthSpend.toFixed(2)}, left: ({Math.abs(budgetDiff).toFixed(2)})</Text>
                             </Flex>
-                            <Progress.Root size="xl">
-                                <Progress.Section value={budgetDiff >= 0 ? 0 : (overallBudget-overallMonthSpend)/overallBudget*100}>
-                                <Progress.Label>{Math.abs(budgetDiff).toFixed(2)}</Progress.Label>
-                                </Progress.Section>
-                            </Progress.Root>
+                            <BudgetBar budget={overallBudget} balance={overallBudget-overallMonthSpend}/>
                         </Stack>
                 </Flex>
             </AppShell.Header>

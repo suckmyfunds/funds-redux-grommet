@@ -237,12 +237,13 @@ export default class GoogleSpreadsheetAPI implements API {
 
 //TODO: use https://github.com/Hookyns/tst-reflect for reflection and auto generation of those functions
 export function transformFundFromResponse(vals: string[]): FundRemote {
-  let [id, name, budget, _, __, initialBalance] = vals
+  let [id, name, budget, _, __, initialBalance, isAccum] = vals
   let result = {
     id,
     name,
     budget: Number.parseFloat(budget),
     initialBalance: Number.parseFloat(initialBalance),
+    isAccum: isAccum == "TRUE",
   }
 
   return result

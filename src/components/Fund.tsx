@@ -36,7 +36,6 @@ export default function Fund({fundId, onClick}: {fundId: string; onClick?: () =>
         },
         [dispatch]
     )
-    console.log("render fund ", name)
     return (
         <Card padding="xs" withBorder>
             <Stack gap="xs" >

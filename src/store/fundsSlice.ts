@@ -7,7 +7,7 @@ import { RootState, getAPIFromStore } from './index'
 
 export const fetchFunds = createAsyncThunk('funds/fetchAll', async (_, { getState }): Promise<FundRemote[]> => {
   const api = getAPIFromStore(getState)
-  return (await api.getRows('funds!A2:F')).map((f) => ({
+  return (await api.getRows('funds!A2:G')).map((f) => ({
     ...transformFundFromResponse(f),
     status: 'idle',
     syncDate: new Date().toISOString(),

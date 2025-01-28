@@ -97,8 +97,20 @@ export const selectFundThisMonthExpense = createSelector([selectFundTransactions
     return thisMonthSpend(transactions)
 })
 
-export const selectThisMonthExpense = createSelector([selectAllTransactions], (transactions) => {
-    return thisMonthSpend(transactions)
+export const selectThisMonthExpense = createSelector([selectAllFunds, selectAllTransactions], (funds, trs) => {
+    const fundsById = funds.reduce((d: Record<string, Fund>, f) => {
+        d[f.id] = f
+        return d
+    }, {})
+
+    const trs_ = trs.map(t => {
+        if (fundsById[t.fundId].isAccum) {
+            return {...t, amount: -t.amount}
+        }
+        else return t
+    })
+
+    return thisMonthSpend(trs_)
 })
 
 function thisMonthSpend(transactions: Transaction[]): number {
