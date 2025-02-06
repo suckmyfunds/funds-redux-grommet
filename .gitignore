@@ -3,3 +3,5 @@ tools/*.xlsx
 .~lock.*.xlsx*
 dist/
 dev-dist/
+
+.early.coverage
