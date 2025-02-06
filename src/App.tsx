@@ -1,6 +1,6 @@
 import '@mantine/core/styles.css'
 
-import {AppShell, Box, Burger, Button, Flex, Progress, Stack, Text, TextInput} from '@mantine/core'
+import {AppShell, Box, Burger, Button, Flex, Stack, Text, TextInput} from '@mantine/core'
 import {useDisclosure} from '@mantine/hooks'
 import {ResponsiveContext} from 'grommet'
 import {useCallback, useContext, useEffect, useState} from 'react'
@@ -145,7 +145,7 @@ export function NewFund() {
     const dispatch = useAppDispatch()
 
     const submit = useCallback(() => {
-        dispatch(createFund({name, budget, initialBalance: 0}))
+        dispatch(createFund({name, budget, initialBalance: 0, isAccum: false}))
     }, [dispatch, name, budget])
     return (
         <Box>
