@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 // Unit tests for: Fund
 
 import { useSelector } from 'react-redux'
@@ -6,6 +9,7 @@ import { useAppDispatch } from '../../../src/store'
 import { addTransactionToFund } from '../../../src/store/transactionsSlice'
 import { fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom'
+import React from 'react'
 
 // Mocking the necessary modules
 jest.mock('../../../src/utils', () => {
